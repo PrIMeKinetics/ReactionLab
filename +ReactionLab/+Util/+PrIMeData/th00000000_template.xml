@@ -1,0 +1,7 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<thermoData xmlns="http://purl.org/NET/prime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" primeID="th00000000" xsi:schemaLocation="http://purl.org/NET/prime/ http://warehouse.primekinetics.org/schema/thermoData.xsd">
+   <copyright>primekinetics.org 2006-2011</copyright>
+   <speciesLink preferredKey="" primeID="" />
+   <discussion date=""/>
+   <thermodynamicDataLink type="" primeID="" />
+</thermoData>

@@ -1,0 +1,71 @@
+function rk = parseRateLinkNode(rxn,rateLinkNode)
+% RateCoefObj = parseRateLinkNode(rxnObj,rateLinkNode)
+%                                                               
+% parse reactionRate links
+
+% Copyright 1999-2010 Michael Frenklach
+% $Revision: 1 $
+% Last modified: May 12, 2010
+
+NET.addAssembly('System.Xml');
+import System.Xml.*;
+
+rxnPrimeId = rxn.PrimeId;
+rxnOrder   = rxn.Order;
+
+if isa(rateLinkNode,'System.Xml.XmlElement')
+   rk = singleRKrecord(rateLinkNode);
+   return
+end
+
+numLinks = double(rateLinkNode.Count);
+if     numLinks == 0
+   rk = [];
+   return
+elseif numLinks == 1
+   rk = singleRKrecord(rateLinkNode.Item(0));
+else                     %  'sum'
+   rk = ReactionLab.ReactionData.ReactionRate.Sum();
+   rk.RxnPrimeId = rxnPrimeId;
+   for i1 = 1:numLinks
+      rk = rk.add(singleRKrecord(rateLinkNode.Item(i1-1)));
+   end
+end
+
+
+   function rk = singleRKrecord(rkLinkNode)
+      rkPrimeId = char(rkLinkNode.GetAttribute('primeID'));
+      rkDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',rxnPrimeId,rkPrimeId});
+      rkType = char(rkDoc.DocumentElement.GetAttribute('rateLawType'));
+      switch lower(rkType)
+         case 'mass action'
+            rkLinkNode = rkDoc.GetElementsByTagName('reactionRateLink');
+            if double(rkLinkNode.Count) == 0
+               rk = ReactionLab.ReactionData.ReactionRate.MassAction(rkDoc,rxnOrder);
+            else
+               rk = rxn.parseRateLinkNode(rkLinkNode);
+               rk.PrimeId = rkPrimeId;
+            end
+         case 'sum'   % sum of only mass-action rate coefs
+            rkLinkNode = rkDoc.GetElementsByTagName('reactionRateLink');
+            rk = rxn.parseRateLinkNode(rkLinkNode);
+            rk.PrimeId = rkPrimeId;
+         case 'third body'
+            rkLinkNode = rkDoc.GetElementsByTagName('reactionRateLink');
+            if double(rkLinkNode.Count == 0)
+               rk = ReactionLab.ReactionData.ReactionRate.ThirdBody(rkDoc,rxnOrder);
+            else
+               rk = rxn.parseRateLinkNode(rkLinkNode);
+               rk.PrimeId = rkPrimeId;
+            end
+         case 'unimolecular'
+            rk = ReactionLab.ReactionData.ReactionRate.Unimolecular(rkDoc);
+         case 'chemical activation'
+            rk = ReactionLab.ReactionData.ReactionRate.ChemActivation(rkDoc);
+         otherwise
+            error(['undefined rate law type: ' rkType ' for ' rxnPrimeId]); 
+      end
+   end
+
+
+end

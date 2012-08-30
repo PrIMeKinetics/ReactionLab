@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<chemicalSpecies xmlns="http://purl.org/NET/prime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" primeID="s00000000" xsi:schemaLocation="http://purl.org/NET/prime/ http://warehouse.primekinetics.org/schema/species.xsd">
+  <copyright>©primekinetics.org 2005-2012</copyright>
+  <preferredKey group="prime" type="formula"></preferredKey>
+  <chemicalIdentifier>
+  </chemicalIdentifier>
+  <chemicalComposition>
+  </chemicalComposition>
+</chemicalSpecies>

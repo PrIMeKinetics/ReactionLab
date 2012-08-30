@@ -1,0 +1,23 @@
+function t = table(arr)
+%t = table(ArrheniusObj)
+
+% Copyright 1999-2010 Michael Frenklach
+% $Revision: 1.1 $
+% Last modified: April 15, 2010
+
+Hfig = figure('Position',[100 100 400 150]);
+
+columnname =   {'A' 'n' 'E (cal/mol)'};
+columnformat = {'numeric' 'numeric' 'numeric'};
+columneditable =  [false false false];
+
+dat = [ arr.A; arr.n; arr.E ]';
+
+t = uitable('Parent',Hfig,...
+            'Units','normalized',...
+            'Position',[0.1 0.1 0.9 0.9],...
+            'Data', dat,... 
+            'ColumnName', columnname,...
+            'ColumnFormat', columnformat,...
+            'ColumnEditable', columneditable,...
+            'RowName',[]);

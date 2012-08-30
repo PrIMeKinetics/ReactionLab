@@ -1,0 +1,1 @@
+function y = amu(units)% y = AMU(units)%  returns atomic mass unit% Copyright 1999-2008 Michael Frenklach% $Revision: 1.1 $% Last modified: May 18, 2008switch lower(units)   case {'g' 'cgs'}      y = 1.67e-24;   case {'kg' 'si'}		y = 1.67e-27;	otherwise		error(['unknown unit: ' units])end

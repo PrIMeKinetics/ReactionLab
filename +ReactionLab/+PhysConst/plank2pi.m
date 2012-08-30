@@ -1,0 +1,1 @@
+function y = plank2pi(units)% y = PLANK2PI(units) returns h/2*pi% Copyright 1999-2008 Michael Frenklach% $Revision: 1.1 $% Last modified: May 18, 2008y = ReactionLab.PhysConst.plank(units)/(2*pi);

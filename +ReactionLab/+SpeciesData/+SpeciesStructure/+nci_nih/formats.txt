@@ -1,0 +1,3 @@
+3d: alc  mol2  xyz
+
+2d: CML  MOL  miv  sdf

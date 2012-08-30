@@ -1,0 +1,1 @@
+function y = speedoflight(units)% y = SPEEDOFLIGHT(units)%  returns the speed of light% Copyright 1999-2008 Michael Frenklach% $Revision: 1.1 $% Last modified: May 18, 2008switch lower(units)   case {'cm/s' 'cgs'}      y = 2.99792458e+10;   case {'m/s' 'si'}		y = 2.99792458e+08;	otherwise		error(['unknown unit: ' units])end

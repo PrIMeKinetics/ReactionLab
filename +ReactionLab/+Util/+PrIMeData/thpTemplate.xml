@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<thermodynamicPolynomials type="Nasa7" xmlns="http://purl.org/NET/prime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" primeID="" xsi:schemaLocation="http://purl.org/NET/prime/ http://warehouse.primekinetics.org/schema/thermodynamicPolynomials.xsd">
+  <copyright>primekinetics.org 2006-2011</copyright>
+  <bibliographyLink preferredKey="" primeID="" />
+  <preferredKey group="prime"></preferredKey>
+  <speciesLink preferredKey="" primeID="" />
+  <referenceState>
+    <Tref units="K"></Tref>
+    <Pref units="Pa"></Pref>
+  </referenceState>
+  <dfH units="K"></dfH>
+</thermodynamicPolynomials>

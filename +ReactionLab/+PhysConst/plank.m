@@ -1,0 +1,1 @@
+function y = plank(units)% y = PLANK(units) returns Plank constant% Copyright 1999-2008 Michael Frenklach% $Revision: 1.1 $% Last modified: May 18, 2008switch lower(units)   case {'erg_s' 'cgs'}      y = 6.626086e-27;   case {'j_s' 'si'}		y = 6.62608e-34;	otherwise		error(['unknown unit: ' units])end
