@@ -59,20 +59,21 @@ set(obj.CurrentPanel,'Visible','on');
            'units','normalized',...
            'Position', [0.4 0 0.6 1.0]);
         HtitleStr = {'Select Thermo File','Upload Species Dictionary'};
-        Htitle2Str = {'Example Files','Example Files'};
-        Htitle3Str = {'Prev/Next','Action'};
+        Htitle2Str = {' ',' '};
+        Htitle3Str = {'Prev/Next','Action Options'};
         Htitle4Str = {'','Converting from inchi to PrIMe ID'};
         HbuttonStr = {'<html><u>Thermo File Requirements</u></html>','<html><u>Species File Requirements</u></html>'};
-        HPosition = {{[30 450 440 20],[50 390 420 60],[50 355 150 30],[30 315 440 20],[50 280 150 30],[30 240 440 20],[50 170 420 70],[30 125 440 20],[50 55 420 70]},...
-                     {[30 450 440 20],[50 390 420 60],[50 370 150 30],[30 335 440 20],[50 300 150 30],[30 260 440 20],[50 190 420 70],[30 150 440 20],[50 20 420 130]}};
-        HdescriptionStr = {'Press the button "Select thermo file" to upload a thermodynamic data file typically used in Chemkin projects.  This file will be used to determine the chemical composition of a given species.   Press the button below to view the requirements for the thermo file formatting.  A full example also can be downloaded under "Example Files".',...
-            {'Upload a species dictionary with the name and corresponding IDs of the species.  Press the button below to view the requirements for the species dictionary formatting.  A full example also can be downloaded under "Example Files".'}};
+        HbuttonVis = {'off','on'};
+        HPosition = {{[30 450 440 20],[50 380 420 70],[50 350 150 30],[30 315 440 20],[50 280 150 30],[30 310 440 20],[50 235 420 70],[30 125 440 20],[50 55 420 70]},...
+                     {[30 450 440 20],[50 380 420 70],[50 340 150 30],[30 315 440 20],[250 340 150 30],[30 300 440 20],[50 230 420 70],[30 190 440 20],[50 10 420 180]}};
+        HdescriptionStr = {'On the left panel, press the button "Select thermo file" to upload a thermodynamic data file typically used in Chemkin projects.  This file will be used to determine the chemical composition of a given species.   The requirements for the thermo file formatting can be viewed by pressing the button below.',...
+            {'On the left panel, press the button "Upload species dictionary" to provide a species dictionary with a list of the species names and their corresponding IDs.  You may view the requirements for the species dictionary formatting, by pressing the button "Species File Requirements" below.  A full example also can be downloaded by pressing the button "Species Dictionary Example" below.'}};
         Hdescription2Str = {'<html><u>Thermo File</u></html>',...
-            {'<html><u>Species Dictionary File</u></html>'}};
+            {'<html><u>Species Dictionary Example</u></html>'}};
         Hdescription3Str = {'Once you have uploaded a thermo file or if you wish to skip uploading a thermo file press "Next" to begin identifying species.',...
             {'Remove: Delete the selected dictionaries from the list below.','Merge: Combine two or more dictionaries of the same ID type into one dictionary.','Edit: View the species dictionary, show information for an individual species, and','        export the dictionary to an excel file.','Convert: Create a species dictionary with PrIMe IDs from a dictionary using inchi IDs.'}};
         Hdescription4Str = {'',...
-            {'Converting a dictionary from inchi to PrIMe IDs will create a "builupDictionary" file with','all definite matches.  After this initial step, you will have the following options:','','Verify: Accept the match found by PrIMe to add the species to the buildupDictionary.','    Reject it to find a match based on the thermo file''s chemical compositions.','Check by Composition: Resolve a species by selecting the correct match, then','    pressing "Select displayed".  If no match is correct, add it to the new species.','Submit to PrIMe: Submit new species to PrIMe by adding fields to properly','    identify the species.  After identifying all species, press "Submit displayed".'}};
+            {'To convert your own inchi species dictionary to a PrIMe ID species dictionary:','       1. Upload your own inchie species dictionary','       2. Select the file name and choose the "Convert" option under "Action"','','A "builupDictionary" file will be created with all definitive PrIMe ID matches.  After this initial step, you will have the following options:','       Verify: Confirm the match to add the species to the buildupDictionary.','       Check by Composition: Resolve a species by choosing the correct match, then','              pressing "Select displayed".  If no match is correct, add it to the new species.','       Submit to PrIMe: Submit new species to PrIMe by adding names, formulas,','              or IDs to identify the species.  Submit each species individually.'}};
         Hlink2Str = {'http://primekinetics.org/tutorials/therm.txt','http://primekinetics.org/tutorials/species_dictionary_inchi_id.xlsx'};
         Hfilename2Str = {'thermo.txt','species_dictionary_inchi_id.xlsx'};
         Htitle = uicontrol('Parent',HRightPanel,...
@@ -102,6 +103,7 @@ set(obj.CurrentPanel,'Visible','on');
         Hdescription2 = uicontrol('Parent',HRightPanel,...
            'Style', 'PushButton', ... 
            'Position', HPosition{1}{5},...
+           'Visible',HbuttonVis{1},...
            'HorizontalAlignment','left',...
            'String', Hdescription2Str{1},...
            'ForegroundColor',[0 0 1],...
@@ -142,6 +144,7 @@ set(obj.CurrentPanel,'Visible','on');
         obj.RightPanel.titleStr = HtitleStr;
         obj.RightPanel.descriptionStr = HdescriptionStr;
         obj.RightPanel.buttonStr = HbuttonStr;
+        obj.RightPanel.buttonVis = HbuttonVis;
         obj.RightPanel.title2Str = Htitle2Str;
         obj.RightPanel.description2Str = Hdescription2Str;
         obj.RightPanel.title3Str = Htitle3Str;
@@ -171,7 +174,7 @@ set(obj.CurrentPanel,'Visible','on');
        set(obj.RightPanel.description,'String',obj.RightPanel.descriptionStr{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{2})
        set(obj.RightPanel.button,'String',obj.RightPanel.buttonStr{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{3})
        set(obj.RightPanel.title2,'String',obj.RightPanel.title2Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{4})
-       set(obj.RightPanel.description2,'String',obj.RightPanel.description2Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{5})
+       set(obj.RightPanel.description2,'String',obj.RightPanel.description2Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{5},'Visible',obj.RightPanel.buttonVis{obj.CurrentPanelIndex})
        set(obj.RightPanel.title3,'String',obj.RightPanel.title3Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{6})
        set(obj.RightPanel.description3,'String',obj.RightPanel.description3Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{7})
        set(obj.RightPanel.title4,'String',obj.RightPanel.title4Str{obj.CurrentPanelIndex},'Position',obj.RightPanel.position{obj.CurrentPanelIndex}{8})
@@ -184,15 +187,19 @@ set(obj.CurrentPanel,'Visible','on');
    end
 
    function downloadFile(hh,dd)
-       [filestr,status]=urlwrite(...
-        obj.RightPanel.link2Str{obj.CurrentPanelIndex},...
-        obj.RightPanel.filename2Str{obj.CurrentPanelIndex});
-       msgbox(['The file named "' obj.RightPanel.filename2Str{obj.CurrentPanelIndex} '" was saved to "' filestr '"']) 
+       [filename, pathname] = uiputfile(obj.RightPanel.filename2Str{obj.CurrentPanelIndex},'Choose Where to Save Example');
+        if isequal(filename,0) || isequal(pathname,0)
+        else
+            savefileName=fullfile(pathname,filename)
+            [filestr,status]=urlwrite(obj.RightPanel.link2Str{obj.CurrentPanelIndex},obj.RightPanel.filename2Str{obj.CurrentPanelIndex});
+            storefileName=filestr;
+            movefile(storefileName,savefileName,'f');
+        end
    end
 
     function viewRequirements(hh,dd)
-        requirementArray={{'1. The file must be in text format (.txt).','2. Nasa polynomial coefficients must include a plus or minus sign before','    each exponent.   (i.e. 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters for each species entry are reserved for the','    species name.  There cannot be any spaces in the species name.'},...
-            {'1. The file must be in excel file format. (.xls or .xlsx)','2. No headers should be included','3. ID Type can be either "inchi" or "PrIMeID"','4. Column A of the excel file corresponds to the species name and Column B','    corresponds to the species ID'}};
+        requirementArray={{'1. The file must be in text format (.txt).','2. Nasa polynomial coefficients must include a plus or minus sign before','    each exponent.   (i.e. 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters for each species entry are reserved for the','    species name.'},...
+            {'1. The file must be in excel file format. (.xls or .xlsx)','2. No headers should be included','3. ID Type can be either "inchi", "PrIMeID", or "comp"','4. Column A of the excel file corresponds to the species name and Column B','    corresponds to the species ID'}};
         msgbox(requirementArray{obj.CurrentPanelIndex},'File Requirements','help')
    end
    
