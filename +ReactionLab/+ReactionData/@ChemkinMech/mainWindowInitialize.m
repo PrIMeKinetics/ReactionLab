@@ -5,7 +5,7 @@ function mainWindowInitialize(obj)
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: December 27, 2011
+% Last modified: Sept 5,2012 Matt - added "help"
 
 Hfig = figure('Position',[50 200 850 490],...
    'NumberTitle', 'off',...
@@ -61,19 +61,19 @@ set(obj.CurrentPanel,'Visible','on');
         HtitleStr = {'Select Thermo File','Upload Species Dictionary'};
         Htitle2Str = {' ',' '};
         Htitle3Str = {'Prev/Next','Action Options'};
-        Htitle4Str = {'','Converting from inchi to PrIMe ID'};
+        Htitle4Str = {'','Converting from InChI to PrIMe IDs'};
         HbuttonStr = {'<html><u>Thermo File Requirements</u></html>','<html><u>Species File Requirements</u></html>'};
         HbuttonVis = {'off','on'};
         HPosition = {{[30 450 440 20],[50 380 420 70],[50 350 150 30],[30 315 440 20],[50 280 150 30],[30 310 440 20],[50 235 420 70],[30 125 440 20],[50 55 420 70]},...
                      {[30 450 440 20],[50 380 420 70],[50 340 150 30],[30 315 440 20],[250 340 150 30],[30 300 440 20],[50 230 420 70],[30 190 440 20],[50 10 420 180]}};
-        HdescriptionStr = {'On the left panel, press the button "Select thermo file" to upload a thermodynamic data file typically used in Chemkin projects.  This file will be used to determine the chemical composition of a given species.   The requirements for the thermo file formatting can be viewed by pressing the button below.',...
-            {'On the left panel, press the button "Upload species dictionary" to provide a species dictionary with a list of the species names and their corresponding IDs.  You may view the requirements for the species dictionary formatting, by pressing the button "Species File Requirements" below.  A full example also can be downloaded by pressing the button "Species Dictionary Example" below.'}};
+        HdescriptionStr = {'Pressing the button "Select thermo file" on the left panel uploads a thermodynamic data file typically used in Chemkin projects.  This file will be used to determine species chemical composition.   The requirements for the thermo file formatting can be viewed by pressing the button below.',...
+            {'Pressing the button "Upload species dictionary" on the left panel uploads a species dictionary: a list of the species names and their corresponding IDs.  The requirements for the species dictionary format can be viewed by pressing the button "Species File Requirements" below.  A full example can also be downloaded by pressing the button "Species Dictionary Example" below.'}};
         Hdescription2Str = {'<html><u>Thermo File</u></html>',...
             {'<html><u>Species Dictionary Example</u></html>'}};
         Hdescription3Str = {'Once you have uploaded a thermo file or if you wish to skip uploading a thermo file press "Next" to begin identifying species.',...
-            {'Remove: Delete the selected dictionaries from the list below.','Merge: Combine two or more dictionaries of the same ID type into one dictionary.','Edit: View the species dictionary, show information for an individual species, and','        export the dictionary to an excel file.','Convert: Create a species dictionary with PrIMe IDs from a dictionary using inchi IDs.'}};
+            {'Remove: Delete the selected dictionaries from the list below.','Merge: Combine two or more selected dictionaries of the same ID type into one dictionary.','Edit: View the species dictionary, show information for an individual species, and','        export the dictionary to an excel file.','Convert: Create a species dictionary with PrIMe IDs from a dictionary using InChI IDs.'}};
         Hdescription4Str = {'',...
-            {'To convert your own inchi species dictionary to a PrIMe ID species dictionary:','       1. Upload your own inchie species dictionary','       2. Select the file name and choose the "Convert" option under "Action"','','A "builupDictionary" file will be created with all definitive PrIMe ID matches.  After this initial step, you will have the following options:','       Verify: Confirm the match to add the species to the buildupDictionary.','       Check by Composition: Resolve a species by choosing the correct match, then','              pressing "Select displayed".  If no match is correct, add it to the new species.','       Submit to PrIMe: Submit new species to PrIMe by adding names, formulas,','              or IDs to identify the species.  Submit each species individually.'}};
+            {'To convert your own InChI species dictionary to a PrIMe ID species dictionary:','       1. Upload your own InChI species dictionary (as described above)','       2. Select the uploaded file and choose the "Convert" option under "Action"','','A "builupDictionary" file will be created with all definitive PrIMe ID matches.  After this initial step, you will have the following options:','       Verify: Confirm the match to add the species to the buildupDictionary.','       Check by Composition: Resolve a species by choosing the correct match, then','              pressing "Select displayed".  If no match is correct, add it to the new species.','       Submit to PrIMe: Submit new species to PrIMe by adding names, formulas,','              or IDs to identify the species.  Submit each species individually.'}};
         Hlink2Str = {'http://primekinetics.org/tutorials/therm.txt','http://primekinetics.org/tutorials/species_dictionary_inchi_id.xlsx'};
         Hfilename2Str = {'thermo.txt','species_dictionary_inchi_id.xlsx'};
         Htitle = uicontrol('Parent',HRightPanel,...
@@ -198,8 +198,8 @@ set(obj.CurrentPanel,'Visible','on');
    end
 
     function viewRequirements(hh,dd)
-        requirementArray={{'1. The file must be in text format (.txt).','2. Nasa polynomial coefficients must include a plus or minus sign before','    each exponent.   (i.e. 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters for each species entry are reserved for the','    species name.'},...
-            {'1. The file must be in excel file format. (.xls or .xlsx)','2. No headers should be included','3. ID Type can be either "inchi", "PrIMeID", or "comp"','4. Column A of the excel file corresponds to the species name and Column B','    corresponds to the species ID'}};
+        requirementArray={{'1. The file should be a properly-formatted NASA 7-coefficient polynomial text file','2. Nasa polynomial coefficients must not contain spaces instead of plus signs','    (i.e., use 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters of the first line of each species record','    must contain only the species name.'},...
+            {'1. The file must be an excel file (.xls or .xlsx)','2. No column headers should be included','3. Column A should contain the species names and Column B','    the corresponding species IDs','4. The ID type can be either "inchi", "PrIMeID", or "comp"'}};
         msgbox(requirementArray{obj.CurrentPanelIndex},'File Requirements','help')
    end
    
