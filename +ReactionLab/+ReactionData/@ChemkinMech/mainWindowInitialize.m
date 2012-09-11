@@ -71,7 +71,7 @@ set(obj.CurrentPanel,'Visible','on');
         Hdescription2Str = {'<html><u>Thermo File</u></html>',...
             {'<html><u>Species Dictionary Example</u></html>'}};
         Hdescription3Str = {'Once you have uploaded a thermo file or if you wish to skip uploading a thermo file press "Next" to begin identifying species.',...
-            {'Remove: Delete the selected dictionaries from the list below.','Merge: Combine two or more selected dictionaries of the same ID type into one dictionary.','Edit: View the species dictionary, show information for an individual species, and','        export the dictionary to an excel file.','Convert: Create a species dictionary with PrIMe IDs from a dictionary using InChI IDs.'}};
+            {'Remove: Delete the selected dictionaries from the list below.','Merge: Combine two or more selected dictionaries of the same ID type.','Edit: View the species dictionary, show information for an individual species, and','        export the dictionary to an excel file.','Convert: Create a species dictionary with PrIMe IDs from a dictionary using InChI IDs.'}};
         Hdescription4Str = {'',...
             {'To convert your own InChI species dictionary to a PrIMe ID species dictionary:','       1. Upload your own InChI species dictionary (as described above)','       2. Select the uploaded file and choose the "Convert" option under "Action"','','A "builupDictionary" file will be created with all definitive PrIMe ID matches.  After this initial step, you will have the following options:','       Verify: Confirm the match to add the species to the buildupDictionary.','       Check by Composition: Resolve a species by choosing the correct match, then','              pressing "Select displayed".  If no match is correct, add it to the new species.','       Submit to PrIMe: Submit new species to PrIMe by adding names, formulas,','              or IDs to identify the species.  Submit each species individually.'}};
         Hlink2Str = {'http://primekinetics.org/tutorials/therm.txt','http://primekinetics.org/tutorials/species_dictionary_inchi_id.xlsx'};
@@ -198,8 +198,8 @@ set(obj.CurrentPanel,'Visible','on');
    end
 
     function viewRequirements(hh,dd)
-        requirementArray={{'1. The file should be a properly-formatted NASA 7-coefficient polynomial text file','2. Nasa polynomial coefficients must not contain spaces instead of plus signs','    (i.e., use 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters of the first line of each species record','    must contain only the species name.'},...
-            {'1. The file must be an excel file (.xls or .xlsx)','2. No column headers should be included','3. Column A should contain the species names and Column B','    the corresponding species IDs','4. The ID type can be either "inchi", "PrIMeID", or "comp"'}};
+        requirementArray={{'1. The file should be a properly-formatted NASA 7-coefficient polynomial','    text file','2. Nasa polynomial coefficients must not contain spaces instead of plus','    signs  (i.e., use 0.25000000e+01 not 0.25000000e 01)','3. The first 18 characters of the first line of each species record','    must contain only the species name.'},...
+            {'1. The file must be an excel file (.xls or .xlsx)','2. No column headers should be included','3. Column A should contain the species names and Column B','    the corresponding species IDs','4. The ID type can be either "InChi", "PrIMeID", or "comp"'}};
         msgbox(requirementArray{obj.CurrentPanelIndex},'File Requirements','help')
    end
    
