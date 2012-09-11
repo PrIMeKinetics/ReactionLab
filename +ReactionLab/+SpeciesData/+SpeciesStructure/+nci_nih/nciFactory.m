@@ -2,11 +2,11 @@ classdef nciFactory < ReactionLab.SpeciesData.SpeciesStructure.MolGeomFactory
    
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.0 $
-% Last modified: July 6, 2012
+% Last modified: September 11, 2012
    
    properties
-      SysAssembly = NET.addAssembly('System');
-      WebClient = System.Net.WebClient;
+%       SysAssembly = NET.addAssembly('System');
+%       WebClient = System.Net.WebClient;
       Url = 'http://cactus.nci.nih.gov/chemical/structure/';
    end
    
@@ -38,7 +38,8 @@ classdef nciFactory < ReactionLab.SpeciesData.SpeciesStructure.MolGeomFactory
       function y = download(obj,molModelObj)
          str = [obj.Url '/' molModelObj.InputString '/file?format=' molModelObj.OutputFormat];
          try
-            molModelObj.OutputString = char(obj.WebClient.DownloadString(str));
+%             molModelObj.OutputString = char(obj.WebClient.DownloadString(str));
+            molModelObj.OutputString = urlread(str);
             y = 1;
          catch
 %             errordlg([molModelObj.InputString ' is not resolved'],'NCI-NIH Resolver','modal');
