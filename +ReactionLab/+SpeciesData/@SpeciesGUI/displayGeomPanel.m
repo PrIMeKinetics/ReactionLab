@@ -3,7 +3,7 @@ function displayGeomPanel(speGUI)
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: July 23, 2012
+% Last modified: September 18, 2012
 
 
 if isempty(speGUI.Hgeom.currentAxesPanel) || ...
@@ -43,6 +43,11 @@ if isempty(curAxes)
       molModel.Hgeom  = speGUI.Hgeom;
       molModel.Hpanel = speGUI.Hgeom.currentAxesPanel;
       molModel.plot(geomDim);
+      speGUI.HgeomError = [];
+   else
+      str = [spe.Key ': Species composition does not match species geometry'];
+      speGUI.HgeomError = errordlg(str,'displayGeomPanel','modal');
+      return;
    end
 else
    set(curAxes,'Layer','top');

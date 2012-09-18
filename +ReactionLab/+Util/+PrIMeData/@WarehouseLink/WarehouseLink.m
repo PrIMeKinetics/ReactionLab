@@ -2,14 +2,16 @@ classdef WarehouseLink < handle
    
 % Copyright 1999-2011 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: June 20, 2011
+% Last modified: September 18, 2012
 
-   properties (SetAccess = protected)
+   properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
       Common = PrimeKinetics.PrimeHandle.Data.Common;
       conn = PrimeKinetics.PrimeHandle.PrimeConnection('','');
       WebServiceClient  = NET.addAssembly(which('+ReactionLab\+Util\PrimeWSClient.dll'));
       ws = PrimeWSClient.PrimeHandleService.PrimeHandle();
+      PrimeEditor_pub = NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor_pub.dll'));
+      GenericEditor = @PrimeEditor.GenericEditor;
       Username = '';
       Password = '';
    end
@@ -58,6 +60,10 @@ classdef WarehouseLink < handle
       function [y,rec] = validateXml(doc)
          rec = PrimeKinetics.PrimeHandle.Data.Common.ValidateXml(doc.OuterXml);
          y = rec.result;
+      end
+      
+      function y = xmlViewer(doc)
+         y = PrimeKinetics.PrimeHandle.XmlViewer(doc);
       end
       
       function filePath = getFilePath(varargin)

@@ -4,12 +4,9 @@ function speWindowInitialize(speSubmit)
 
 % Copyright 1999-2012 Michael Frenklach
 % % $Revision: 1.1 $
-% Last modified: August 17, 2012
+% Last modified: September 18, 2012
 
-NET.addAssembly('System.Xml');
-
-NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor_pub.dll'));
-NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
+wLink = ReactionLab.Util.PrIMeData.WarehouseLink();
 
 speWindowInitialize@ReactionLab.SpeciesData.SpeciesGUI(speSubmit);
 
@@ -116,8 +113,13 @@ drawnow;
       speSubmit.CurrentSpecies = spe;
       set(Hcomp, 'String',upper(d{ind,5}));
       set(Hinchi,'String',spe.InChI);
-      displaySpeNames()
+      displaySpeNames();
       speSubmit.Hid.eval();
+      if ~isempty(speSubmit.HgeomError)
+         set(speSubmit.Hfound,'Enable','off');
+      else
+         set(speSubmit.Hfound,'Enable','on');
+      end
    end
 
    function displaySpeNames()
@@ -176,7 +178,7 @@ drawnow;
       refresh([],[]);
       curSpe = speSubmit.CurrentSpecies;
       speDoc = curSpe.spe2dom();
-      v = PrimeKinetics.PrimeHandle.XmlViewer(speDoc);
+      v = ReactionLab.Util.PrIMeData.WarehouseLink.xmlViewer(speDoc);
       v.Title = curSpe.Key;
       v.ShowDialog;
    end
@@ -200,7 +202,7 @@ drawnow;
      % create a new XML doc for the new species
       speDoc = curSpe.spe2dom();
      % call submit window
-      g = PrimeEditor.GenericEditor(curSpe.Key,speDoc.OuterXml);
+      g = wLink.GenericEditor(curSpe.Key,speDoc.OuterXml);
       g.ShowDialog();
      % process the result
       if ~isempty(g.resultOfSubmitfile.status)
@@ -226,7 +228,7 @@ drawnow;
 
          function sendEmailFirst(h,d)
             delete(gcbf);
-            ReactionLab.Util.send_email('mfrenklach@gmail.com','species','duplicate InChIs',...
+            ReactionLab.Util.send_email('mfrenklach@gmail.com','duplicate species InChIs',...
                ['I want to submit a new species, ' curSpe.Key ', but a species' ...
                 ' with the same InChI, ' curSpe.InChI ', already exist in the' ...
                 ' PrIMe Warehouse.  Which one is the correct one?']  );

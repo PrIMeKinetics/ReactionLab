@@ -4,7 +4,7 @@ function initializeResultsPanel(obj)
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: August 17, 2012
+% Last modified: September 18, 2012
 
 Hpanel = obj.Hpanel;
 panelColor = get(Hpanel,'BackgroundColor');
@@ -192,7 +192,10 @@ obj.Hresults = Hresults;
    function submit2prime(hh,dd)
       d = obj.Hresults.notInPrIMe;
       speSubmitGUI = ReactionLab.Util.PrIMeData.SpeciesDepot.SpeciesSubmit(obj);
-      waitfor(speSubmitGUI.Hfig);
+%       waitfor(speSubmitGUI.Hfig);
+      if ~isempty(speSubmitGUI.HgeomError)
+         figure(speSubmitGUI.HgeomError);
+      end
    end
 
 

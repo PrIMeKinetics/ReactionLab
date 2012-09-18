@@ -1,7 +1,7 @@
 classdef PrIMeSpecies < handle
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: February 13, 2012
+% Last modified: September 18, 2012
 
    properties (SetAccess = private)
       Doc     = [];
@@ -15,6 +15,7 @@ classdef PrIMeSpecies < handle
    
    methods
       function obj = PrIMeSpecies(arg)
+         
          if nargin > 0
             if isa(arg,'System.Xml.XmlDocument')
                doc = arg;

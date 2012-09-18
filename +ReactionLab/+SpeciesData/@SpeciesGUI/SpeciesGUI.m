@@ -2,7 +2,7 @@ classdef SpeciesGUI < handle
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.0 $
-% Last modified: March 21, 2012
+% Last modified: September 18, 2012
    
    properties
       Hfig
@@ -10,6 +10,7 @@ classdef SpeciesGUI < handle
       Hlist
       Hid
       Hgeom
+      HgeomError
       
       SpeList
       PrevSpeList

@@ -2,7 +2,7 @@ classdef SpeciesSubmit < ReactionLab.SpeciesData.SpeciesGUI
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.0 $
-% Last modified: April 21, 2012
+% Last modified: September 18, 2012
 
    properties
       Dict
@@ -37,7 +37,7 @@ classdef SpeciesSubmit < ReactionLab.SpeciesData.SpeciesGUI
             if isempty(obj.CurrentSpecies.InChI)
                set(obj.Hfound,'Enable','off');
             end
-            obj.displayIdPanel();
+%             obj.displayIdPanel();
 %             set(obj.Hid.panel,'Visible','on');
             set(obj.Hfig,'Visible','on');
          end
