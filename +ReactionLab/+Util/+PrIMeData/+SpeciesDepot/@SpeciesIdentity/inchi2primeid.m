@@ -11,7 +11,7 @@ function dOut = inchi2primeid(obj,dictInchi,dictPrimeId)
 
 % Copyright 1999-2012 Michael Frenklach
 % $Revision: 1.1 $
-% Last modified: March 20, 2012
+% Last modified: September 19, 2012
 
 
 if nargin < 2 || isempty(dictInchi)
@@ -79,7 +79,7 @@ for i1 = 1:nInchi
          dNew{ii,2} = foundAmongMulti{2};
          dNew{ii,3} = foundAmongMulti{4};
       else
-         multiList = [multiList; { d{i1,1} foundAmongMulti(:,[2 4]) ii }];
+         multiList = [multiList; { d{i1,1} foundAmongMulti(:,[2 4]) ii inchi}];
       end
    else
       speObj = obj.getSpeByPrimeid(primeId{:});

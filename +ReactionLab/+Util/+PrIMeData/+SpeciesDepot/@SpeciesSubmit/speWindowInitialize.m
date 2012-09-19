@@ -4,7 +4,7 @@ function speWindowInitialize(speSubmit)
 
 % Copyright 1999-2012 Michael Frenklach
 % % $Revision: 1.1 $
-% Last modified: September 18, 2012
+% Last modified: September 19, 2012
 
 wLink = ReactionLab.Util.PrIMeData.WarehouseLink();
 
@@ -190,14 +190,32 @@ drawnow;
      % before submitting as new species, check (again)
      %    if there exists a species with the same InChI in Warehouse
       primeId = ReactionLab.Util.PrIMeData.SpeciesDepot.PrIMeSpecies.warehouseSearch({'inchi',curSpe.InChI});
+      speIDobj = speSubmit.SpeIdentity;
+      dictBuilt = speIDobj.getDictByName('buildupDictionary');
       if ~isempty(primeId)
-         msg = {'There is already a species in the PrIMe Warehouse with the same InChI,'; ... 
-                ' ';  curSpe.InChI ; ' '; ...
-                'Resolve this before proceeding further.'; ' '; ...
-                'Pressing OK will send an email to help with this.' };
-         h = warndlg(msg,'multiple InChIs','modal');
-         set(findobj(get(h,'Children'),'Tag','OKButton'),'Callback',@sendEmailFirst);
-         return
+         if length(primeId) > 1
+            msg = {'There are multiple species in the PrIMe Warehouse with the same InChI,'; ... 
+                   ' ';  curSpe.InChI ; ' '; ...
+                   'Resolve this before proceeding further.'; ' '; ...
+                   'Pressing OK will send an email to help with this.' };
+            h = warndlg(msg,'multiple InChIs','modal');
+            set(findobj(get(h,'Children'),'Tag','OKButton'),'Callback',@sendEmailFirst);
+            return
+         % first check if this was (just) uploaded
+         elseif any(strcmp(dictBuilt.dict(:,2),primeId))
+            msg = {'This species is already in your buildupDictionary,';...
+                   ' '; [curSpe.Key '   ' curSpe.InChI]                  };
+            warndlg(msg,'multiple InChIs','modal');
+            return
+         else
+            msg = {'There is already a species in the PrIMe Warehouse with the same InChI,'; ... 
+                   ' ';  curSpe.InChI ; ' '; ...
+                   'Resolve this before proceeding further.'; ' '; ...
+                   'Pressing OK will send an email to help with this.' };
+            h = warndlg(msg,'multiple InChIs','modal');
+            set(findobj(get(h,'Children'),'Tag','OKButton'),'Callback',@sendEmailFirst);
+            return
+         end
       end
      % create a new XML doc for the new species
       speDoc = curSpe.spe2dom();
@@ -212,7 +230,6 @@ drawnow;
 %          g.returnpath
 %          g.returnobject
          speObj = ReactionLab.SpeciesData.Species(newPrimeId);
-         speIDobj = speSubmit.SpeIdentity;
          speIDobj.addLocalSpecies(speObj);
          dictEntry = {curSpe.Key newPrimeId};
          speIDobj.updateSpeDict('buildupDictionary',dictEntry,'primeId');

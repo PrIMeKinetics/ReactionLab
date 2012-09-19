@@ -100,14 +100,6 @@ classdef SpeciesIdentity < handle
          end
       end
       
-%       function set.SpeFound(obj,val)
-%          
-%       end
-%       
-%       function set.SpeNotFound(obj,val)
-%          
-%       end
-      
       function d = getDictByType(obj,type)
       % return a merged dictionary of the specified type
          dd = obj.SpeDict;
