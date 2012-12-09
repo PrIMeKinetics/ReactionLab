@@ -8,9 +8,8 @@ classdef Nasa7 < ReactionLab.ThermoData.Thermo
 %   Nasa7obj = Nasa7.loadXml(filePath)
 %   Nasa7obj = Nasa7.loadDoc(XmlDocumentObj)
    
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: November 21, 2011
+% Copyright 1999-2012 Michael Frenklach
+% Last modified: December 2, 2012
 
    properties
       SpeciesKey = '';
@@ -70,7 +69,7 @@ classdef Nasa7 < ReactionLab.ThermoData.Thermo
          end
       end
       function [y,fileName] = load(filePath)
-         if nargin == 0
+         if nargin == 0 || isempty(filePath)
             [str,fileName] = ReactionLab.Util.getTextFile('Nasa7 Thermo');
          else
             [str,fileName] = ReactionLab.Util.getTextFile('',filePath);
@@ -78,7 +77,7 @@ classdef Nasa7 < ReactionLab.ThermoData.Thermo
          if isempty(str)
             y = [];
          else
-            y = ReactionLab.ThermoData.Nasa7.loadTxt(str,fileName);
+            y = ReactionLab.ThermoData.Nasa7.readNasa7(str,fileName);
          end
       end
       function y = loadXml(filePath)

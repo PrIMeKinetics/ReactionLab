@@ -4,8 +4,7 @@ function initializeFirstWindow(obj)
 %  loading and identifying species
 
 % Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: March 29, 2012
+% Last modified: December 2, 2012
 
 Hpanel = obj.Hpanel;
 
@@ -131,7 +130,7 @@ end
                di = obj.SpeDict(ind);
                switch lower(di.type)
                   case 'primeid'
-                     
+                     obj.updateSpeDict('buildupDictionary',di.dict,'primeId');
                   case 'inchi'
                      if isempty(di.match)
                         if check4duplicateKeys(di.dict,di.fileName), return, end

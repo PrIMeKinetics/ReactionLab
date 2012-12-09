@@ -1,8 +1,7 @@
 classdef ChemkinMech < handle
    
-% Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: February 13, 2012
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: December 2, 2012
    
    properties (SetAccess = 'private')
       MechFileName = '';
@@ -27,6 +26,7 @@ classdef ChemkinMech < handle
       CurrentPanelIndex = 0;
       
       SpeciesIdentity
+       ThermoIdentity
    end
    
    properties

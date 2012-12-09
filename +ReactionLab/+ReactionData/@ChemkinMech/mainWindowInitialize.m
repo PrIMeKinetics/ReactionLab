@@ -3,9 +3,8 @@ function mainWindowInitialize(obj)
 % sets the main window for loading 
 %   a chemkin file
 
-% Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: Sept 5,2012 Matt - added "help"
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: December 8, 2012
 
 Hfig = figure('Position',[50 200 850 490],...
    'NumberTitle', 'off',...
@@ -43,6 +42,7 @@ obj.HpanelTemplate = @createNewPanel;
 
 obj.loadReactionSetWindow();
 addPanel(ReactionLab.Util.PrIMeData.SpeciesDepot.SpeciesIdentity(obj),'SpeciesIdentity');
+% addPanel(ReactionLab.Util.PrIMeData.ThermoDepot.ThermoIdentity(obj),  'ThermoIdentity');
 obj.CurrentPanelIndex = 1;
 set(obj.CurrentPanel,'Visible','on');
 
