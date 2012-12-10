@@ -14,9 +14,8 @@ function [y,z] = isequal(th1,th2,options)
 % options indicates which criteria to use for comparison,
 %   i.e., options = [1 2] or =[1:6]
 
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: June 12, 2011
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: December 9, 2011
 
 ff = {@test1 @test2 @test3 @test4 @test5 @test6};
 
@@ -39,7 +38,7 @@ y = all(z);
 
    function u = test1
    % comment strings
-      u = strcmpi(th1.Comment,th2.Comment);
+      u = strcmpi(strtrim(th1.Comment),strtrim(th2.Comment));
    end
 
    function u = test2

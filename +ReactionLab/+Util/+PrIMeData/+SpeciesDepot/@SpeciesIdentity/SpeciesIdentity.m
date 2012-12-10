@@ -1,7 +1,7 @@
 classdef SpeciesIdentity < handle
 
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: December 2, 2012
+% Last modified: December 8, 2012
 
    properties (SetAccess = 'private')
       Chemkin
@@ -99,7 +99,7 @@ classdef SpeciesIdentity < handle
          end
          if strcmp(fileName,'buildupDictionary') ... 
                && ~isempty(dict) && ~isempty(obj.Chemkin.ThermoArray)
-            set(obj.Chemkin.BottomPanel.Hnext,'Visible','on');
+            set(obj.Chemkin.BottomPanel.Hnext,'Enable','on');
          end
       end
       
