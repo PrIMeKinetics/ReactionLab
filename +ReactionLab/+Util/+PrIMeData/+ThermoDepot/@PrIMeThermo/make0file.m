@@ -4,9 +4,8 @@ function th0Doc = make0file(obj,dataFileId)
 %  make th00000000 XmlDument file, point it to dataFileId
 %    and validate
 
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: August 1, 2011
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: December 9, 2012
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -17,7 +16,7 @@ thpDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeID',obj.SpeciesId,dataF
 key = char(thpDoc.GetElementsByTagName('speciesLink').Item(0).GetAttribute('preferredKey'));
 
 th0Doc = XmlDocument;
-th0Doc.Load(which('+ReactionLab/+Util/+PrIMeData/th00000000_template.xml'));
+th0Doc.Load(which('+ReactionLab/+Util/+PrIMeData/+ThermoDepot/th00000000_template.xml'));
 speNode = th0Doc.GetElementsByTagName('speciesLink').Item(0);
 speNode.SetAttribute('preferredKey',key);
 speNode.SetAttribute('primeID',obj.SpeciesId);

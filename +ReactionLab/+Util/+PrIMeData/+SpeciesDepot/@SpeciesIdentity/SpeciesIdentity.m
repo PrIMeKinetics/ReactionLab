@@ -1,7 +1,7 @@
 classdef SpeciesIdentity < handle
 
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: December 8, 2012
+% Last modified: December 9, 2012
 
    properties (SetAccess = 'private')
       Chemkin
@@ -33,7 +33,7 @@ classdef SpeciesIdentity < handle
    methods
       function obj = SpeciesIdentity(chemkinObj)
          if nargin > 0
-            [~,obj.MainSpeDict] = xlsread(which('+ReactionLab/+Util/+PrIMeData/defaultSpeciesDictionary.xlsx'));
+            [~,obj.MainSpeDict] = xlsread(which('+ReactionLab/+Util/+PrIMeData/+SpeciesDepot/defaultSpeciesDictionary.xlsx'));
             obj.addSpeDict('defaultSpeciesDictionary',obj.MainSpeDict,'primeId');
             obj.Chemkin = chemkinObj;
             obj.Hpanel = feval(chemkinObj.HpanelTemplate);

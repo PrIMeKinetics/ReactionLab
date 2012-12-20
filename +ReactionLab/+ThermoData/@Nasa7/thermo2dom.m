@@ -4,16 +4,17 @@ function thDoc = thermo2dom(th)
 % Creates PrIMe Schema-compliant thermodynamic polynomials DOM object
 % from Matlab thermoPoly structure
 
-% Copyright 2006-2010 primekinetics.org
+% Copyright 2006-2013 primekinetics.org
 % Created by: Zoran M. Djurisic, University of California at Berkeley, 23 January 2006.
-% Last edited by Zoran M. Djurisic, UC Berkeley, on 1 November 2007.
-% Last Modified: December 15, 2010, myf
+% edited by Zoran M. Djurisic, UC Berkeley, on 1 November 2007.
+% Modified: December 15, 2010, myf
+% Last Modified: December 12, 2012: changed directory of thpTemplate
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
 
 thDoc = System.Xml.XmlDocument;
-thDoc.Load(which('+ReactionLab\+Util\+PrIMeData\thpTemplate.xml'));
+thDoc.Load(which('+ReactionLab\+Util\+PrIMeData\+ThermoDepot\thpTemplate.xml'));
 
 rootElement = thDoc.DocumentElement;
 
@@ -108,5 +109,5 @@ end
 docStr = char(thDoc.OuterXml);
 cleanStr = strrep(docStr,' xmlns=""','');
 clear thDoc;
-thDoc = XmlDocument;
+thDoc = System.Xml.XmlDocument;
 thDoc.LoadXml(cleanStr);

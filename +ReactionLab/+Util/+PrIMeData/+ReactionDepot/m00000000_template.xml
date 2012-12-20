@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<chemicalModel primeID="m00000000" xmlns="http://purl.org/NET/prime/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://purl.org/NET/prime/ http://warehouse.primekinetics.org/schema/model.xsd">
+  <copyright>©primekinetics.org 2009-2013</copyright>
+  <preferredKey group="prime"></preferredKey>
+  <bibliographyLink preferredKey="" primeID="" />
+  <speciesSet>
+    <speciesLink preferredKey="" primeID="">
+      <thermodynamicDataLink preferredKey="" primeID="" />
+    </speciesLink>
+  </speciesSet>
+  <reactionSet>
+    <reactionLink preferredKey="" reversible="true" primeID="">
+      <reactionRateLink preferredKey="" primeID="" />
+    </reactionLink>
+  </reactionSet>
+  <additionalDataItem itemType="text" description="Model description"></additionalDataItem>
+</chemicalModel>
