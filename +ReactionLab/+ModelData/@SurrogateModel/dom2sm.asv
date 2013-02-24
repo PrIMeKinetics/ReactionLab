@@ -1,0 +1,73 @@
+function sm = dom2sm(smDoc)
+% SurrogateModelObj = dom2sm(smDoc)
+
+% Copyright 2008-2010 primekinetics.org
+% Created by: Xiaoqing You, UC Berkeley, November 19, 2008
+% Modified by: Xiaoqing You, UC Berkeley, November 25, 2008.
+% Modified: Michael Frenklach, April 23, 2010 - new Matlab OOP
+% Modified: Michael Frenklach, May 21, 2010 - added variableBounds
+% Modified: William Speight, Feb 18, 2013 - updated to current Matlab OOP
+
+NET.addAssembly('System.Xml');
+import System.Xml.*;
+
+sm = ReactionLab.ModelData.SurrogateModel();
+sm.PrimeId = char(smDoc.DocumentElement.GetAttribute('primeID'));
+
+preferredKey = smDoc.GetElementsByTagName('preferredKey').Item(0);
+key = strtrim(char(preferredKey.InnerText));
+if ~isempty(key)
+   sm.Key = key;
+else
+   error('surrogateModel XML file does not have preferredKey');
+end
+
+% loading target
+daNode = smDoc.GetElementsByTagName('dataAttributeLink').Item(0);
+sm.Weight = str2double(char(daNode.GetAttribute('weight')));
+sm.Target.primeId = char(daNode.GetAttribute('primeID'));
+sm.Target.transformation = strtrim(char(daNode.GetAttribute('transformation')));
+
+% loading optimizationVariables
+optVarsNode = smDoc.GetElementsByTagName('optimizationVariables');
+optVarNode = optVarsNode.Item(0).GetElementsByTagName('optimizationVariableLink');
+optVar = sm.OptimizationVariables;
+numOptVar = double(optVarNode.Count);
+for i1 = 1:numOptVar
+   optVarRecord = optVarNode.Item(i1-1);
+   optVar(i1).varId      = strtrim(char(optVarRecord.GetAttribute('id')));
+   optVar(i1).varPrimeId = strtrim(char(optVarRecord.GetAttribute('primeID')));
+   optVar(i1).bndPrimeId = strtrim(char(optVarRecord.GetAttribute('boundsPrimeID')));
+end
+sm.OptimizationVariables = optVar;
+
+% loading coefficients
+coefNode = smDoc.GetElementsByTagName('coefficient');
+nCoef = double(coefNode.Count);
+allocCell = cell(1,nCoef);
+coef = struct('variables', allocCell, 'value', allocCell);
+for i1 = 1:nCoef
+   coefItem = coefNode.Item(i1-1);
+   varLinks = coefItem.GetElementsByTagName('variableLink');
+   var = [];
+   for i2 = 1:double(varLinks.Count)
+      var = [var str2double(char(varLinks.Item(i2-1).InnerText))];
+   end
+   coef(i1).variables = var;
+   valueNode = coefItem.GetElementsByTagName('value').Item(0);
+   coef(i1).value = str2double(char(valueNode.InnerText));
+end
+sm.Coef = coef;
+
+additionalData = smDoc.GetElementsByTagName('additionalDataItem');
+len = double(additionalData.Count);
+if len > 0
+   adata = sm.AdditionalData;
+   for i1 = 1:len
+      dataItem = additionalData.Item(i1-1);
+      adata(i1).itemType    = char(dataItem.GetAttribute('itemType'));
+      adata(i1).description = char(dataItem.GetAttribute('description'));
+      adata(i1).content     = char(dataItem.InnerText);
+   end
+   sm.AdditionalData = adata;
+end

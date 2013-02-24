@@ -23,7 +23,7 @@ speExtra = unique(speExtra);
 for i1 = 1:length(speExtra)
    spePrimeId = speExtra{i1};
    speList = speList.add(ReactionLab.SpeciesData.Species(spePrimeId));
-   thPrimeId = ReactionLab.Util.gate2primeData('getBestCurrentId',{'primeID',spePrimeId,'thp'});
+   thPrimeId = ReactionLab.Util.gate2primeData('getBestCurrentId',{'primeID',spePrimeId,'th'});
    thDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',spePrimeId,thPrimeId});
    thList(spePrimeId) = ReactionLab.ThermoData.Nasa7(thDoc);
 end
@@ -39,8 +39,9 @@ if length(refT) > 1
 end
 refP = unique([refStateStruct.P]);
 if length(refP) > 1
-   disp(refP);
-   error('different reference P');
+   %disp(refP);
+   %error('different reference P');
+   refP=refP(1);
 end
 
 speObjs = rs.Species.Values;   % the list rs's species

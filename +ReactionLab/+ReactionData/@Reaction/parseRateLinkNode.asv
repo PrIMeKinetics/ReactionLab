@@ -18,35 +18,23 @@ if isa(rateLinkNode,'System.Xml.XmlElement')
    return
 end
 
-try
-    numLinks = double(rateLinkNode.getLength);
-catch
-    numLinks = double(rateLinkNode.Count);
-end
+numLinks = double(rateLinkNode.getLength);
 if     numLinks == 0
    rk = [];
    return
 elseif numLinks == 1
-    if ismethod(rateLinkNode,'Item')
-        rk = singleRKrecord(rateLinkNode.Item(0));
-    else
-        rk = singleRKrecord(rateLinkNode.item(0));
-    end
+   rk = singleRKrecord(rateLinkNode.item(0));
 else                     %  'sum'
    rk = ReactionLab.ReactionData.ReactionRate.Sum();
    rk.RxnPrimeId = rxnPrimeId;
    for i1 = 1:numLinks
-      rk = rk.add(singleRKrecord(rateLinkNode.Item(i1-1)));
+      rk = rk.add(singleRKrecord(rateLinkNode.item(i1-1)));
    end
 end
 
 
    function rk = singleRKrecord(rkLinkNode)
-      try
-          rkPrimeId = char(rkLinkNode.getAttribute('primeID'));
-      catch
-          rkPrimeId = char(rkLinkNode.GetAttribute('primeID'));
-      end
+      rkPrimeId = char(rkLinkNode.GetAttribute('primeID'));
       rkDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',rxnPrimeId,rkPrimeId});
       rkType = char(rkDoc.DocumentElement.GetAttribute('rateLawType'));
       switch lower(rkType)

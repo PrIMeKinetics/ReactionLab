@@ -217,12 +217,9 @@ hdf5write(hdf5path,'/reactionData/reactionRateType',  rxnType,           ...
          case 'ReactionLab.ReactionData.ReactionRate.Unimolecular'
             rxnType{iRxn} = 'unimolecular';
             parseRK(rk.High);
-            switch class(rk.Low)
-                case 'ReactionLab.ReactionData.ReactionRate.ThirdBody'
-                    parseThirdBody(2,rk.Low)
-                otherwise
-                    parseThirdBody(2,[rk.Low.Values{:}]);
-            end
+            if class
+            values=
+            parseThirdBody(2,[rk.Low.Values{:}]);
             falloff{iRxn} = rk.Falloff;
          case 'ReactionLab.ReactionData.ReactionRate.ChemActivation'
             rxnType{iRxn} = 'chemical activation';

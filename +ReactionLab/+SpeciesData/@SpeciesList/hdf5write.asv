@@ -49,9 +49,8 @@ if length(refT) > 1
 end
 refP = unique([refStateStruct.P]);
 if length(refP) > 1
-   refP=refP(1);
    %disp(refP);
-   %error('different reference P');
+   error('different reference P');
 end
 
 speciesThermoGroup = '/speciesData/thermoPolynomials/';
