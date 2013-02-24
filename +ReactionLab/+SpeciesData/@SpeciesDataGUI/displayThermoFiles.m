@@ -10,7 +10,7 @@ spePrimeId = spe.PrimeId;
 set(speGUI.Hfiles.spePrimeId,'String',['for  ' spePrimeId]);
 
 if isempty(findprop(spe,'PrIMeThermoObj'))
-   obj = ReactionLab.Util.PrIMeData.PrIMeThermo(spePrimeId);
+   obj = ReactionLab.Util.PrIMeData.ThermoDepot.PrIMeThermo(spePrimeId);
    addprop(spe,'PrIMeThermoObj');
    spe.PrIMeThermoObj = obj;
 else
@@ -20,7 +20,7 @@ set(speGUI.Hfiles.bestCurrent,'String',obj.BestCurrentId);
 thIds = obj.PolynomialFileIds;
 
 if isempty(findprop(spe,'PrIMeThermoPPs'))
-   th = ReactionLab.Util.PrIMeData.PrIMeThermo.nasa7toPP(spe,...
+   th = ReactionLab.Util.PrIMeData.ThermoDepot.PrIMeThermo.nasa7toPP(spe,...
                               thIds,speGUI.Hfiles.refElemThermo);
    addprop(spe,'PrIMeThermoPPs');
    spe.PrIMeThermoPPs = th;
