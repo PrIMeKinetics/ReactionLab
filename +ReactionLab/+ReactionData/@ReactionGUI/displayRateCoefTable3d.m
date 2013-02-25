@@ -4,9 +4,8 @@ function displayRateCoefTable3d(rxnGUI,r,T,kF,kR,P)
 % displays a table of reaction rate coefficients
 %                    k(T,P) vs T and P
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: November 22, 2010
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: February 25, 2013
 
 direction = 'forward';
 data = kF;
@@ -18,7 +17,7 @@ lenP = length(P);  nCols = min(lenP,10);
 lenT = length(T);  nRows = min(lenT,30);
 
 hRows = 20*(nRows+3);
-wCols = 80*nCols;
+wCols = 95*nCols;
 pos = [200 250 wCols hRows];  % 405-320 = 85
 Hfig = figure(...
    'Position', pos,...

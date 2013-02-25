@@ -3,9 +3,8 @@ function displayRateCoefTable(rxnGUI,r,T,kF,eqK,P)
 %
 % displays a table of reaction rate coefficients
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: November 21, 2010
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: February 25, 2013
 
 au = rxnGUI.aUnits;
 
@@ -65,9 +64,9 @@ uicontrol('Parent',Hfig,...
    'Style', 'text',...
    'Position', [10 hRows-25 300 20],...
    'HorizontalAlignment', 'center',...
+   'BackgroundColor', get(Hfig,'Color'),...
    'FontSize', 10,...
    'String', str );
-
 
    function plotVsT(h,d,y,yLabel)
       figure('NumberTitle','off', 'Name',r.Eq);
