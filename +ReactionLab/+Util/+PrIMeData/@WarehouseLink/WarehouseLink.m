@@ -1,7 +1,7 @@
 classdef WarehouseLink < handle
    
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 12, 2013
+% Last modified: March 14, 2013
 
    properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
@@ -14,21 +14,16 @@ classdef WarehouseLink < handle
       PrimeHandle_local = NET.addAssembly(which('+ReactionLab\+Util\PrimeHandle.dll'));
       Username = '';
       Password = '';
+      Authorized = false;
    end
    
    methods
       function obj = WarehouseLink(un,pw)
          if nargin > 0
-            if isempty(un)
-               obj.loginWindow;
-               obj.conn.Username = obj.Username;
-               obj.conn.Password = obj.Password;
-            else
-               obj.Username = un;
-               obj.Password = pw;
-               obj.conn.Username = un;
-               obj.conn.Password = pw;
-            end
+            obj.Username = un;
+            obj.Password = pw;
+            obj.conn.Username = un;
+            obj.conn.Password = pw;
          end
       end
       
@@ -52,6 +47,12 @@ classdef WarehouseLink < handle
          if ~res.result
             error([webDirPath ': could not record ' propName]);
          end
+      end
+      function y = isAuthorized(obj)
+         if ~y
+            obj.loginWindow();
+         end
+         y = obj.Authorized;
       end
    end
 
