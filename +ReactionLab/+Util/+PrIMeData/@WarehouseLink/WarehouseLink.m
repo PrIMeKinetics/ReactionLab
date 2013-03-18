@@ -1,7 +1,7 @@
 classdef WarehouseLink < handle
    
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 14, 2013
+% Last modified: March 16, 2013
 
    properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
@@ -12,6 +12,9 @@ classdef WarehouseLink < handle
       PrimeEditor_pub = NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor_pub.dll'));
       GenericEditor = @PrimeEditor.GenericEditor;
       PrimeHandle_local = NET.addAssembly(which('+ReactionLab\+Util\PrimeHandle.dll'));
+   end
+   
+   properties (SetAccess = protected)
       Username = '';
       Password = '';
       Authorized = false;
@@ -49,7 +52,7 @@ classdef WarehouseLink < handle
          end
       end
       function y = isAuthorized(obj)
-         if ~y
+         if ~obj.Authorized
             obj.loginWindow();
          end
          y = obj.Authorized;
