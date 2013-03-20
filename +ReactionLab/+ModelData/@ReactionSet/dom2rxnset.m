@@ -10,32 +10,32 @@ function rs = dom2rxnset(rs,modelDoc)
 NET.addAssembly('System.Xml');
 import System.Xml.*;
 
-rs.PrimeId = char(modelDoc.getDocumentElement.getAttribute('primeID'));
+rs.PrimeId = char(modelDoc.DocumentElement.GetAttribute('primeID'));
 
-rs.Title = char(modelDoc.getElementsByTagName('preferredKey').item(0).getTextContent);
+rs.Title = char(modelDoc.GetElementsByTagName('preferredKey').Item(0).InnerText);
 
-biblioNode = modelDoc.getElementsByTagName('bibliographyLink').item(0);
-rs.BiblioKey = char(biblioNode.getAttribute('preferredKey'));
-rs.BiblioId  = char(biblioNode.getAttribute('primeID'));
+biblioNode = modelDoc.GetElementsByTagName('bibliographyLink').Item(0);
+rs.BiblioKey = char(biblioNode.GetAttribute('preferredKey'));
+rs.BiblioId  = char(biblioNode.GetAttribute('primeID'));
 
 % loading species
-speSetNode = modelDoc.getElementsByTagName('speciesSet');
-speciesNode = speSetNode.item(0).getElementsByTagName('speciesLink');
-numSpe = double(speciesNode.getLength);
+speSetNode = modelDoc.GetElementsByTagName('speciesSet');
+speciesNode = speSetNode.Item(0).GetElementsByTagName('speciesLink');
+numSpe = double(speciesNode.Count);
 elList = {};
 speListObj = ReactionLab.SpeciesData.SpeciesList();
 thList = containers.Map;
 Hwait = waitbar(0,'species','Name',['Loading from PrIMe: ' rs.Title]);
 for i1 = 1:numSpe
-   speciesRecord = speciesNode.item(i1-1);
-%    speKey     = char(speciesRecord.getAttribute('preferredKey'));
-   spePrimeId = char(speciesRecord.getAttribute('primeID'));
+   speciesRecord = speciesNode.Item(i1-1);
+%    speKey     = char(speciesRecord.GetAttribute('preferredKey'));
+   spePrimeId = char(speciesRecord.GetAttribute('primeID'));
    speObj = ReactionLab.SpeciesData.Species(spePrimeId);
    speListObj = speListObj.add(speObj);
    waitbar(i1/numSpe,Hwait,['species  ' speObj.Key '  (' spePrimeId ')'],...
                             'Name',['Loading from PrIMe: ' rs.Title]       );
    elList = unique([elList {speObj.Elements.symbol}]);
-   thPrimeId = char(speciesRecord.getElementsByTagName('thermodynamicDataLink').item(0).getAttribute('primeID'));
+   thPrimeId = char(speciesRecord.GetElementsByTagName('thermodynamicDataLink').Item(0).GetAttribute('primeID'));
    thDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',spePrimeId,thPrimeId});
    thList(spePrimeId) = ReactionLab.ThermoData.Nasa7(thDoc);
 %    speObj.Thermo = thObj;
@@ -59,19 +59,19 @@ rs.setThermo(thList);
           
 % get reactions
 rxnListObj = ReactionLab.ReactionData.ReactionList();
-rxnSetNode = modelDoc.getElementsByTagName('reactionSet');
-rxnNode = rxnSetNode.item(0).getElementsByTagName('reactionLink');
-numRxn = double(rxnNode.getLength);
+rxnSetNode = modelDoc.GetElementsByTagName('reactionSet');
+rxnNode = rxnSetNode.Item(0).GetElementsByTagName('reactionLink');
+numRxn = double(rxnNode.Count);
 Hwait = waitbar(0,'reactions','Name',['Loading from PrIMe: ' rs.Title]);
 for i1 = 1:numRxn
-   rxnRecord = rxnNode.item(i1-1);
-   rxnKey     = char(rxnRecord.getAttribute('preferredKey'));
-   rxnPrimeId = char(rxnRecord.getAttribute('primeID'));
+   rxnRecord = rxnNode.Item(i1-1);
+   rxnKey     = char(rxnRecord.GetAttribute('preferredKey'));
+   rxnPrimeId = char(rxnRecord.GetAttribute('primeID'));
    waitbar(i1/numRxn,Hwait,['reaction ' rxnKey '  (' rxnPrimeId ')'],...
                             'Name',['Loading from PrIMe: ' rs.Title]      );
    rxnObj = ReactionLab.ReactionData.Reaction(rxnPrimeId);
-   rxnObj.Reversible = str2num(char(rxnRecord.getAttribute('reversible')));
-   rateDataLink = rxnRecord.getElementsByTagName('reactionRateLink');
+   rxnObj.Reversible = str2num(char(rxnRecord.GetAttribute('reversible')));
+   rateDataLink = rxnRecord.GetElementsByTagName('reactionRateLink');
    rk = rxnObj.parseRateLinkNode(rateDataLink);
    if isempty(rk)
       error(['no rate coefficient link for ' rxnPrimeId])
@@ -84,15 +84,15 @@ close(Hwait);
 
 rs.Reactions = rxnListObj;
 
-additionalData = modelDoc.getElementsByTagName('additionalDataItem');
-len = double(additionalData.getLength);
+additionalData = modelDoc.GetElementsByTagName('additionalDataItem');
+len = double(additionalData.Count);
 if len > 0
    adata = rs.AdditionalData;
    for i1 = 1:len
-      dataItem = additionalData.item(i1-1);
-      adata(i1).itemType = char(dataItem.getAttribute('itemType'));
-      adata(i1).description = char(dataItem.getAttribute('description'));
-      adata(i1).content = char(dataItem.getTextContent);
+      dataItem = additionalData.Item(i1-1);
+      adata(i1).itemType = char(dataItem.GetAttribute('itemType'));
+      adata(i1).description = char(dataItem.GetAttribute('description'));
+      adata(i1).content = char(dataItem.InnerText);
    end
    rs.AdditionalData = adata;
 end

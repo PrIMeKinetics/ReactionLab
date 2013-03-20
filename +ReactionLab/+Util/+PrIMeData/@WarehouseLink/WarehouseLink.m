@@ -1,7 +1,7 @@
 classdef WarehouseLink < handle
    
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 16, 2013
+% Last modified: March 20, 2013
 
    properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
@@ -81,6 +81,14 @@ classdef WarehouseLink < handle
          else                           %  objPrimeId, dataPrimeId
             filePath = char(PrimeKinetics.PrimeHandle.Data.Common.PrimeID2path(varargin{1:2}));
          end
+      end
+      
+      function rsDoc = searchGUI(d)
+         sGui = PrimeKinetics.PrimeHandle.SearchGUI(d);
+         sGui.Topmost = true;
+         sGui.ShowDialog();
+         rsDoc = sGui.ReturnObject;
+%          sGui.ReturnObject;
       end
       
    end
