@@ -6,8 +6,8 @@ classdef WarehouseFile < ReactionLab.Util.PrIMeData.WarehouseLink
 % WarehouseFile(username,password,'m00000003','.mat|.h5')
 % WarehouseFile(''      ,''      ,'d00000003','.mat|.h5')
 
-% Copyright 1999-2013 Michael Frenklach
-% Last modified: March 17, 2013
+% Copyright (c) 1999-2013 Michael Frenklach
+% Last modified: March 21, 2013
 
    properties (SetAccess = private)
       PrimeId    = '';
@@ -57,6 +57,11 @@ classdef WarehouseFile < ReactionLab.Util.PrIMeData.WarehouseLink
             obj.FilePath = filePath;
          end
       end
+      
+      function y = Exist(obj)
+         res = obj.conn.Exist(obj.FilePath);
+         y = res.result;
+      end
  
       function y = getPropertyNames(obj)
 %          z = obj.ws.GetPropertyNames(obj.FilePath,obj.Username,obj.Password);
@@ -82,17 +87,10 @@ classdef WarehouseFile < ReactionLab.Util.PrIMeData.WarehouseLink
             error([obj.FilePath ': could not record ' propName]);
          end
       end
-      function y = isequal(thisObj,anotherFileObj,prop)
-         NET.addAssembly('System');
-         DT = System.DateTime();
-         if nargin < 3
-            prop = 'getlastmodified';
-         end
-         df1 = thisObj.getProperty(prop);
-         b1 = DT.Parse(df1);
-         df2 = anotherFileObj.getProperty(prop);
-         b2 = DT.Parse(df2);
-         y = b1.Equals(b2);
+      function y = isequalProperty(thisObj,anotherFileObj,prop)
+         prop1 = thisObj.getProperty(prop);
+         prop2 = anotherFileObj.getProperty(prop);
+         y = strcmp(prop1,prop2);
       end
    end
    
