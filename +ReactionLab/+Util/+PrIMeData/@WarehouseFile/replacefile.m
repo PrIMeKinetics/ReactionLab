@@ -1,5 +1,6 @@
-function replacefile(obj,fileLocalPath,reason)
-% replacefile(WarehouseFileobj,fileLocalPath,reason)
+function replacefile(obj,fileLocalPath,reason,opt)
+% replacefile(WarehouseFileobj,fileLocalPath,reason,displayOption)
+% displayOption = 1  with dialog boxes, otherwise  line command
 %
 % replace file in Warehouse:
 %   move current file to attic
@@ -10,10 +11,12 @@ function replacefile(obj,fileLocalPath,reason)
 %   '...\objPrimeId\dataPrimeId'  (e.g., '...\s00001234\thp00000001')
 %               =
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: December 31, 2010
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: March 26, 2013, myf added display option
 
+if nargin < 4
+   opt = 0;
+end
 
 outStr = '';
 
@@ -26,11 +29,12 @@ elseif length(primeId) > 9
    obj.setFile(primeId,objPrimeId);
    outStr = [outStr objPrimeId '\data\' primeId];
 else
-   error(['incorrect length of primeId ' primeId]);
+   ReactionLab.Util.displayOption(opt,'error',...
+            ['incorrect length of primeId ' primeId]);
 end
 
-removefile(obj,reason);
-uploadfile(obj,fileLocalPath,reason);
+removefile(obj,reason,opt);
+uploadfile(obj,fileLocalPath,reason,opt);
 
 
-disp(['replaced ' outStr]);
+ReactionLab.Util.displayOption(opt,'disp',['replaced ' outStr]);

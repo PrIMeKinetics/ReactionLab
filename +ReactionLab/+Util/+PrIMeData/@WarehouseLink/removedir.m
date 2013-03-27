@@ -1,10 +1,14 @@
-function removedir(obj,primeId,reason)
-% removedir(WarehouseLinkObj,primeId,reason)
+function removedir(obj,primeId,reason,opt)
+% removedir(WarehouseLinkObj,primeId,reason,displayOption)
 % move primeId data directory to attic
+% displayOption = 1  with dialog boxes, otherwise  line command
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: December 31, 2010
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: March 26, 2013, myf added display option
+
+if nargin < 4
+   opt = 0;
+end
 
 webFilePath = char(obj.Common.PrimeID2path(primeId));
 dataDirPath = [fileparts(fileparts(webFilePath)) '/data/'];
@@ -17,7 +21,8 @@ setProperty(obj,'updateReason',reason,webDirPath);
 newDirPath = [dataDirPath '_attic/' primeId '_' int2str(0)];
 res6 = Move(obj.ws,webDirPath,newDirPath,obj.Username,obj.Password);
 if ~res6.result
-   error([webDirPath ': could not move old directory to attic']);
+   ReactionLab.Util.displayOption(opt,'error',...
+                     [webDirPath ': could not move old directory to attic']);
 end
 
-disp(['moved ' webDirPath ' to attic'])
+ReactionLab.Util.displayOption(opt,'disp',['moved ' webDirPath ' to attic']);

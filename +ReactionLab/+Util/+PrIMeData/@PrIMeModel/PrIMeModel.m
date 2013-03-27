@@ -1,7 +1,7 @@
 classdef PrIMeModel < handle
    
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 25, 2013
+% Last modified: March 26, 2013
 
    properties (SetAccess = private)
       PWAcomponent = [];
@@ -12,9 +12,11 @@ classdef PrIMeModel < handle
       Title        = '';
       CatalogFile  = [];
       
-      DocRS        = [];
+      RSdoc        = [];
       RSfile       = [];
       RSobj        = [];   % ReactionSet object
+      
+      H5file       = [];
    end
    
    methods
@@ -28,6 +30,7 @@ classdef PrIMeModel < handle
                obj.DocIn = arg;
             elseif ischar(arg)   % model primeId
                obj.PrimeId = arg;
+               obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
             else
                error(['incorrect object class ' class(arg)])
             end
@@ -40,8 +43,8 @@ classdef PrIMeModel < handle
          indSource = char(modelSourceOption.GetAttribute('value'));
       end
       
-      function getFromXml(obj,docRS)
-         obj.DocRS = docRS;
+      function setIdFromXml(obj,docRS)
+         obj.RSdoc = docRS;
          docRoot = docRS.DocumentElement;
          obj.PrimeId = strtrim(char(docRoot.GetAttribute('primeID')));
          preferredKey = docRoot.GetElementsByTagName('preferredKey').Item(0);
@@ -50,29 +53,25 @@ classdef PrIMeModel < handle
          obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
       end
       
-      function getRS(obj)
-         % load and create ReactionSet object of DocRS
-         % first check if rs exist in Warehouse
-         rsFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
-         if rsFile.Exist
-            if obj.areDatesMatch(rsFile)
-               obj.RSfile = rsFile;
-               if ~obj.copyFromWH()
-                  error(['file ' rsFile.FilePath ' could not be copied']);
-               end
+      function fileObj = getFile(obj,fileType)
+         %    fileType = '.mat'  or  '.hdf5'
+         % load/create ReactionSet or HDF5 of RSdoc
+         % first check if file exists already in Warehouse
+         file = ReactionLab.Util.PrIMeData.WarehouseFile('','',[obj.PrimeId fileType]);
+         if file.Exist
+            if obj.areDatesMatch(file)
+               file.download(obj.LocalDirPath,1);
             else
-               rs = ReactionLab.ModelData.ReactionSet(obj.DocRS);
-               obj.RSobj = rs;
-%                res = obj.conn.Upload(fileLocalPath,obj.FilePath);
-               if ~obj.uploadToWH()
-                  helpdlg(['uploaded ' fileLocalPath ' as ' obj.FilePath],'File Upload');
+               localFilePath = obj.createFile(fileType);
+               if file.isAuthorized
+                  file.replace(localFilePath,'update',1);
                end
             end
-            
-            keyboard
-            
          else
-            
+            localFilePath = obj.createFile(fileType);
+            if file.isAuthorized
+               file.upload(localFilePath,'new',1);
+            end
          end
       end
       
@@ -94,25 +93,19 @@ classdef PrIMeModel < handle
          docRS = ReactionLab.Util.gate2primeData('getDOM',{'primeId',obj.PrimeId});
          obj.getFromXml(docRS);
       end
-      function setXMLfile(obj,un,pw)
-         obj.XMLfile = ReactionLab.Util.PrIMeData.WarehouseFile(un,pw,obj.PrimeId);
-      end
-      function y = copyFromWH(obj)
-         res = obj.conn(obj.RSfile.FilePath,obj.LocalDirPath);
-         y = res.status;
-      end
-      function uploadToWH(obj)
-         if obj.RSfile.isAuthorized
-            res = obj.conn.Upload(obj.LocalDirPath,obj.FilePath);
-            if res.result
-               setProperty(obj,'submittedBy',obj.Username);
-               setProperty(obj,'updateReason','updated with the latest XML version');
-               helpdlg(['uploaded ' fileLocalPath ' as ' obj.FilePath],'File Upload');
-            else
-               errordlg(['File ' obj.FilePath ' could not be uploaded to PrIMe Warehouse'],...
-                         'failure to upload','modal');
-            end
-            obj.upload(obj.LocalDirPath,'update');
+      
+      function localFilePath = createFile(obj,fileExt)
+         if isempty(obj.RSobj)
+            obj.RSobj = ReactionLab.ModelData.ReactionSet(obj.RSdoc);
+         end
+         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId fileExt]);
+         if strcmpi(fileExt,'.mat')
+            f = obj.RSobj;
+         elseif strcmpi(fileExt,'.hdf5')
+            obj.RSobj.hdf5write(localFilePath);
+            save(localFilePath,'f');
+         else
+            error(['undefined file ext: ' fileExt]);
          end
       end
    end

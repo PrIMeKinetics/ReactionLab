@@ -1,15 +1,20 @@
-function deletefile(obj)
-% deletefile(WarehouseFileobj)
+function deletefile(obj,opt)
+% deletefile(WarehouseFileobj,displayOption)
+% displayOption = 1  with dialog boxes, otherwise  line command
 %
 % delete file without moving it to attic --- only for the administrator
 
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: January 1, 2011
+% Copyright 1999-2013 Michael Frenklach
+% Last modified: March 26, 2013, myf added display option
+
+if nargin < 2
+   opt = 0;
+end
 
 res = obj.ws.Delete(obj.FilePath,obj.Username,obj.Password);
 if ~res.result
-   error([obj.FilePath ': could not be deleted']);
+   ReactionLab.Util.displayOption(opt,'error',...
+              [obj.FilePath ': could not be deleted']);
 end
 
-disp(['deleted ' obj.FilePath])
+ReactionLab.Util.displayOption(opt,'disp',['deleted ' obj.FilePath])
