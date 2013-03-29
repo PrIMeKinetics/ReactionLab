@@ -1,10 +1,12 @@
 classdef PrIMeModel < handle
    
-% Copyright 1999-2013 Michael Frenklach
-% Last modified: March 26, 2013
+% Copyright (c) 1999-2013 Michael Frenklach
+% Last modified: March 28, 2013
 
    properties (SetAccess = private)
+      XmlAssembly  = NET.addAssembly('System.Xml');
       PWAcomponent = [];
+      SourceIndex  = [];    % 1 - load from warehouse; 2 - local
       LocalDirPath = '';
       DocIn        = [];
       
@@ -24,8 +26,9 @@ classdef PrIMeModel < handle
          if nargin > 0
             if isa(arg,'Component')
                obj.PWAcomponent = arg;
-               obj.DocIn = arg.DocIn;
+               obj.DocIn        = arg.DocIn;
                obj.LocalDirPath = arg.OutputDirectory;
+               obj.SourceIndex  = arg.getSelectedOption('Model Source');
             elseif isa(arg,'System.Xml.XmlDocument')
                obj.DocIn = arg;
             elseif ischar(arg)   % model primeId
@@ -35,12 +38,6 @@ classdef PrIMeModel < handle
                error(['incorrect object class ' class(arg)])
             end
          end
-      end
-      
-      function indSource = getOption(obj,option)
-         modelSourceNode   = obj.getnode(obj.docIn,'list','description',option);
-         modelSourceOption = obj.getnode(modelSourceNode,'option','selected','true');
-         indSource = char(modelSourceOption.GetAttribute('value'));
       end
       
       function setIdFromXml(obj,docRS)
@@ -53,25 +50,20 @@ classdef PrIMeModel < handle
          obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
       end
       
-      function fileObj = getFile(obj,fileType)
-         %    fileType = '.mat'  or  '.hdf5'
-         % load/create ReactionSet or HDF5 of RSdoc
-         % first check if file exists already in Warehouse
-         file = ReactionLab.Util.PrIMeData.WarehouseFile('','',[obj.PrimeId fileType]);
+      function setRS(obj)
+         % check if ReactionSet object does not exist or not current in Warehouse 
+         %     and create it from RSdoc and update, both .mat and .h5 files
+         file = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
          if file.Exist
-            if obj.areDatesMatch(file)
-               file.download(obj.LocalDirPath,1);
+            if obj.areDatesMatch(file)  % check if .mat is current - matches the catalog file
+               obj.downloadBinary(file);
             else
-               localFilePath = obj.createFile(fileType);
-               if file.isAuthorized
-                  file.replace(localFilePath,'update',1);
-               end
+               obj.rsFromXml(1);
+               obj.h5FromRS();  % update the H5 file also
             end
          else
-            localFilePath = obj.createFile(fileType);
-            if file.isAuthorized
-               file.upload(localFilePath,'new',1);
-            end
+            obj.rsFromXml(0);
+            obj.h5FromRS();  % update the H5 file also
          end
       end
       
@@ -89,25 +81,55 @@ classdef PrIMeModel < handle
          end
       end
       
-      function loadDOM(obj)
-         docRS = ReactionLab.Util.gate2primeData('getDOM',{'primeId',obj.PrimeId});
-         obj.getFromXml(docRS);
+      function rsFromXml(obj,doesFileExist)
+         obj.RSobj = ReactionLab.ModelData.ReactionSet(obj.RSdoc);
+         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
+         rs = obj.RSobj;
+         save(localFilePath,'rs');
+         if file.isAuthorized
+            if doesFileExist
+               file.deletefile(1);
+            end
+            file.uploadfile(localFilePath,'new',1);
+         end
       end
       
-      function localFilePath = createFile(obj,fileExt)
-         if isempty(obj.RSobj)
-            obj.RSobj = ReactionLab.ModelData.ReactionSet(obj.RSdoc);
-         end
-         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId fileExt]);
-         if strcmpi(fileExt,'.mat')
-            f = obj.RSobj;
-         elseif strcmpi(fileExt,'.hdf5')
-            obj.RSobj.hdf5write(localFilePath);
-            save(localFilePath,'f');
-         else
-            error(['undefined file ext: ' fileExt]);
+      function downloadBinary(obj,matFile)
+         matFile.download(obj.LocalDirPath,1);
+         s = load(obj.LocalDirPath);
+         f = filenames(s);
+         obj.RSobj = s.(f{1});
+         whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
+         whFile.download(obj.LocalDirPath,1);
+      end
+      
+      function h5FromRS(obj)
+         whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
+         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
+         obj.RSobj.hdf5write(localFilePath);
+         if whFile.isAuthorized
+            if whFile.Exist
+               file.deletefile(1);
+            end
+            file.uploadfile(localFilePath,'new',1);
          end
       end
+      
+      function loadDOM(obj)
+         docRS = ReactionLab.Util.gate2primeData('getDOM',{'primeId',obj.PrimeId});
+         obj.getIdFromXml(docRS);
+      end
+      
+%  may be for later
+%       function rsFromH5(obj)
+%          whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
+%          localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
+%          
+%          captionStruc = hdf5read(filePath,'/title');
+% 
+%          obj = ReactionLab.Util.PrIMeData.PrIMeModel(primeId);
+%          obj.setIdFromH5();
+%       end
    end
     
 end

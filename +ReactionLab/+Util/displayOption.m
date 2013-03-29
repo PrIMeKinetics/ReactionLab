@@ -6,14 +6,14 @@ function displayOption(opt,type,txt)
 
 % Copyright 1999-2013 Michael Frenklach
 % Created: March 26, 2013, myf
-% Last modified: March, 26, 2013, myf
+% Last modified: March, 27, 2013, myf
 
 if opt   %  dialog messages
    switch lower(type)
       case 'error'
          errordlg(txt,'','modal');
       case 'disp'
-         helpdlg(txt,'');
+%         helpdlg(txt,'');
       otherwise
          error(['unsupported type ' type]);
    end
