@@ -1,7 +1,8 @@
 classdef WarehouseLink < handle
    
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 20, 2013
+% Created: March 20, 2013
+% Last modified: April 4, 2013, myf
 
    properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
@@ -14,10 +15,10 @@ classdef WarehouseLink < handle
       PrimeHandle_local = NET.addAssembly(which('+ReactionLab\+Util\PrimeHandle.dll'));
    end
    
-   properties (SetAccess = protected)
-      Username = '';
-      Password = '';
-      Authorized = false;
+   properties (Dependent = true)
+      Username
+      Password
+      Authorized
    end
    
    methods
@@ -25,13 +26,42 @@ classdef WarehouseLink < handle
          if nargin > 0
             obj.Username = un;
             obj.Password = pw;
-            obj.conn.Username = un;
-            obj.conn.Password = pw;
+            obj.authenticate();
+         end
+      end
+      
+      function y = get.Username(obj)
+         y = char(obj.conn.Username);
+      end
+      function y = get.Password(obj)
+         y = char(obj.conn.Password);
+      end
+      function set.Username(obj,un)
+         obj.conn.Username = un;
+      end
+      function set.Password(obj,pw)
+         obj.conn.Password = pw;
+      end
+      function y = get.Authorized(obj)
+         y = getappdata(obj.conn,'Authorized');
+         if isempty(y)
+            y = false;
+         end
+      end
+      
+      function y = exist(obj,path)
+         if isempty(path)
+            y = false;
+         else
+%          z = obj.ws.Exist(path,obj.Username,obj.Password);
+            z = obj.conn.Exist(path);
+            y = z.result;
          end
       end
       
       function y = getPropertyNames(obj,filePath)
-         z = obj.ws.GetPropertyNames(filePath,obj.Username,obj.Password);
+%          z = obj.ws.GetPropertyNames(filePath,obj.Username,obj.Password);
+         z = obj.conn.GetPropertyNames(filePath);
          res = z.result;
          y = cell(res.Length,1);
          for i1 = 1:res.Length
@@ -39,16 +69,20 @@ classdef WarehouseLink < handle
          end
       end
       function y = getDetails(obj,filePath)
-         y = obj.ws.GetDetails(filePath,obj.Username,obj.Password);
-      end
-      function y = getProperty(obj,propName,filePath)
-         z = obj.ws.PropFind(filePath,propName,obj.Username,obj.Password);
+%          y = obj.ws.GetDetails(filePath,obj.Username,obj.Password);
+         z = obj.conn.GetDetails(filePath);
          y = char(z.result);
       end
-      function setProperty(obj,propName,propValue,filePath)
-         res = obj.ws.PropPatch(filePath,propName,propValue,obj.Username,obj.Password);
-         if ~res.result
-            error([webDirPath ': could not record ' propName]);
+      function y = getProperty(obj,filePath,propName)
+%          z = obj.ws.PropFind(filePath,propName,obj.Username,obj.Password);
+         z = obj.conn.PropFind(filePath,propName);
+         y = char(z.result);
+      end
+      function setProperty(obj,filePath,propName,propValue)
+%          res = obj.ws.PropPatch(filePath,propName,propValue,obj.Username,obj.Password);
+         res = obj.conn.PropPatch(filePath,propName,propValue);
+         if ~res.status
+            error([filePath ': could not record ' propName]);
          end
       end
       function y = isAuthorized(obj)

@@ -3,10 +3,15 @@ function authenticate(wLink)
 % check the PrIMe user database for the username and password
 
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 14, 2013
+% Created: March 14, 2013
+% Last modified: April 1, 2013
 
 userName     = wLink.Username;
 userPassword = wLink.Password;
+if isempty(char(userName)) || isempty(char(userPassword))
+   setappdata(wLink.conn,'Authorized',false);
+   return
+end
 
 http = PrimeKinetics.PrimeHandle.Utils.HTTPWorker();
 http.Url = PrimeKinetics.PrimeHandle.Config.GetDrupalUsersUrl();
@@ -21,4 +26,5 @@ rsp = http.SendRequest;
 a = http.ResponseText;
 [~,b] = strtok(strtok(char(a)),':');
 b(1) = [];
-wLink.Authorized = logical(str2num(b));
+
+setappdata(wLink.conn,'Authorized',logical(str2num(b)));

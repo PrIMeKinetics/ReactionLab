@@ -3,6 +3,10 @@ function hdf5write(rs,hdf5path)
 %
 % covert ReactionSet object into HDF5
 
+% TO BE REMOVED LATER --- used older syntax
+% April 4, 2013, myf
+
+
 % Copyright 1999-2010 Michael Frenklach
 % $Revision: 1 $
 % Last modified: May 21, 2010

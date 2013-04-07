@@ -3,13 +3,16 @@ function loginWindow(wLink)
 % opens window for entry of username and password
 
 % Copyright 1999-2013 Michael Frenklach
-% Last modified: March 17, 2013
+% Created: March 17, 2013, myf
+% Last modified: April 1, 2013, myf
 
 wLink.PrimeEditor_pub;
 logdlg = PrimeEditor.LoginGUI();
 logdlg.Topmost = true;
 logdlg.ShowDialog();
-wLink.Username = char(logdlg.Username);
-wLink.Password = char(logdlg.Password);
+un = char(logdlg.Username);
+pw = char(logdlg.Password);
+wLink.Username = un;
+wLink.Password = pw;
 
 wLink.authenticate();

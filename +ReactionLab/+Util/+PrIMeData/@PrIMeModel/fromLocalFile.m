@@ -1,29 +1,28 @@
 function fromLocalFile(obj,fileName,fileDirPath)
-% fromLocalFile(obj,fileName,fileDirPath)
+% fromLocalFile(PrIMeModelObj,fileName,fileDirPath)
 % 
 % determine the file type by its extension
 %   and create approporiate objects and
 %   store corresponding files in component directory
 
 % Copyright (c) 1999-2013 Michael Frenklach
-% Created: March 28, 2013, myf 
-% Last modified: March 28, 2013
+%       Created: March 28, 2013, myf 
+% Last modified: April  6, 2013, myf
 
-% NET.addAssembly('System.Xml');
+NET.addAssembly('System.Xml');
 
 % determine the file type
-[~,~,ext] = fileparts(fileName);
-filePath   = fullfile(fileDirPath,fileName);                  % path to local file
-h5FilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);  % to be copied as
+[~,name,ext] = fileparts(fileName);
+obj.Title = name;
+filePath = fullfile(fileDirPath,fileName);  % path to uploaded file
 
 switch lower(ext)
    case '.xml'  %  xml catalog file
       loadXml();
    case '.h5'   %  HDF5 file
-      idFromHDF5(filePath);
-      copyFileToComponentDir([obj.PrimeId '.h5']);
+      loadH5();
    case '.mat'  %  ReactionSet object
-      loadRS();
+      loadMat();
    otherwise
       error(['file type ' ext ' is not supported']);
 end
@@ -31,43 +30,32 @@ end
 
    function loadXml()
       docXml = System.Xml.XmlDocument;
-      docXml.Load(strIn);
-      setIdFromXml(obj,docXml)
-      obj.CatalogFile = '';
-      obj.RSobj = ReactionLab.ModelData.ReactionSet(obj.RSdoc);
-      outputFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
-      rs = obj.RSobj;
-      save(outputFilePath,'rs');
-      h5FromRS();
+      docXml.Load(filePath);
+      obj.Doc = docXml;
+      obj.xml2mat();
+      saveFiles();
    end
 
-   function idFromHDF5(path)
-      titleStruc = hdf5read(path,'/title');
-      obj.Title = titleStruc.data;
-      idStruc = hdf5read(path,'/primeID');
-      obj.PrimeId = idStruc.data;
-   end
-
-   function loadRS()
-      s = load(filePath);
-      f = filenames(s);
-      obj.RSobj = s.(f{1});
-      obj.PrimeId = obj.RSobj.PrimeId;
-      obj.Title = obj.RSobj.Title;
-      copyFileToComponentDir([obj.PrimeId '.mat']);
-      h5FromRS();
-   end
-
-   function h5FromRS()
-      h5FilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
-      obj.RSobj.hdf5write(h5FilePath);
-      idFromHDF5(h5FilePath);
-   end
-
-   function copyFileToComponentDir(fileNameWext)
-      outputFilePath = fullfile(obj.LocalDirPath,fileNameWext);
+   function loadH5()
+      outputFilePath = fullfile(obj.LocalDirPath,[name '.h5']);
       copyfile(filePath,outputFilePath,'f');
       fileattrib(outputFilePath,'+w');
+   end
+
+   function loadMat()
+      s = load(filePath);
+      f = fieldnames(s);
+      obj.MatObj = s.(f{1});
+      saveFiles();
+   end
+
+   function saveFiles()
+      matObj = obj.MatObj;
+      outputFilePath = fullfile(obj.LocalDirPath,[name '.mat']);
+      save(outputFilePath,'matObj');
+      outputFilePath = fullfile(obj.LocalDirPath,[name '.h5']);
+%       matObj.h5write(outputFilePath);
+      matObj.hdf5write(outputFilePath);
    end
          
 end

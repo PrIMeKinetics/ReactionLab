@@ -1,9 +1,10 @@
-function window(rs)
-% window(ReactionSetObj)
+function Hfig = window(rs)
+% Hfig = window(ReactionSetObj)
 % sets the main window for ReactionSet obj
 
 % Copyright 1999-2013 Michael Frenklach
 % Created: February 25, 2013, myf
+% Last modified: March 29, 2013, myf: output Hfig
 
 Hfig = figure('Position',[100 200 350 300],...
    'NumberTitle', 'off',...

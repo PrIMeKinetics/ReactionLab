@@ -1,78 +1,127 @@
 classdef PrIMeModel < handle
    
 % Copyright (c) 1999-2013 Michael Frenklach
-% Last modified: March 28, 2013
+% Created: March 2013, myf
+% Last modified: April 6, 2013, myf
 
-   properties (SetAccess = private)
+   properties
       XmlAssembly  = NET.addAssembly('System.Xml');
       PWAcomponent = [];
-      SourceIndex  = [];    % 1 - load from warehouse; 2 - local
+      SourceIndex  = [];   % 1 - load from warehouse; 2 - local
       LocalDirPath = '';
-      DocIn        = [];
+      DocIn        = [];   % input from PWA
       
       PrimeId      = '';
       Title        = '';
-      CatalogFile  = [];
+      CatalogFile  = [];   % file obj of XML catalog file 
+      Doc          = [];   % XmlDocument of MatObj
       
-      RSdoc        = [];
-      RSfile       = [];
-      RSobj        = [];   % ReactionSet object
-      
-      H5file       = [];
+      MatObj       = [];   % object (ReactionSet)
+      MatFileWH    = [];   % file object of MatObj in warehouse
+      MatFileLocal = '';   % path to local mat file
+      H5fileWH     = [];   % file obj of HDF5 in warehouse
+      H5pathLocal  = '';   % path to local HDF5 file
    end
    
    methods
       function obj = PrIMeModel(arg)
          if nargin > 0
-            if isa(arg,'Component')
+            if isa(arg,'Component')   % PWA Component object
                obj.PWAcomponent = arg;
                obj.DocIn        = arg.DocIn;
                obj.LocalDirPath = arg.OutputDirectory;
-               obj.SourceIndex  = arg.getSelectedOption('Model Source');
-            elseif isa(arg,'System.Xml.XmlDocument')
-               obj.DocIn = arg;
-            elseif ischar(arg)   % model primeId
-               obj.PrimeId = arg;
-               obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
+               obj.SourceIndex  = arg.getSelectedOption('Source');
             else
                error(['incorrect object class ' class(arg)])
             end
          end
       end
       
-      function setIdFromXml(obj,docRS)
-         obj.RSdoc = docRS;
-         docRoot = docRS.DocumentElement;
+      function y = get.MatObj(obj)
+         if isempty(obj.MatObj)
+            obj.setMat();
+            s = load(obj.MatFileLocal);
+            f = fieldnames(s);
+            obj.MatObj = s.(f{1});
+         end
+         y = obj.MatObj;
+      end
+      
+      function y = get.H5pathLocal(obj)
+         if isempty(obj.H5pathLocal)
+            obj.setH5();
+         end
+         y = obj.H5pathLocal;
+      end
+      
+      function setIdFromXml(obj,doc)
+         obj.Doc = doc;
+         docRoot = doc.DocumentElement;
          obj.PrimeId = strtrim(char(docRoot.GetAttribute('primeID')));
+         obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
+         obj.commonSettings();
+      end
+      
+      function setFromPrimeId(obj,primeId)
+         obj.PrimeId = primeId;
+         obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
+         obj.Doc = obj.CatalogFile.loadXml();
+         obj.commonSettings();
+      end
+      
+      function commonSettings(obj)
+         docRoot = obj.Doc.DocumentElement;
          preferredKey = docRoot.GetElementsByTagName('preferredKey').Item(0);
          key = strtrim(char(preferredKey.InnerText));
          obj.Title = lower(key(isstrprop(key,'alphanum')));
-         obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
+         obj.MatFileWH   = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
+%          obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
+         obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.txt');
+         obj.MatFileLocal = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
+         obj.H5pathLocal  = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
       end
       
-      function setRS(obj)
-         % check if ReactionSet object does not exist or not current in Warehouse 
-         %     and create it from RSdoc and update, both .mat and .h5 files
-         file = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
-         if file.Exist
-            if obj.areDatesMatch(file)  % check if .mat is current - matches the catalog file
-               obj.downloadBinary(file);
+      function xml2mat(obj)
+      % specific to ReactionSet; need to be overloaded in derived classes
+         obj.MatObj = ReactionLab.ModelData.ReactionSet(obj.Doc);
+      end
+      
+      function setMat(obj)
+         % if mat file does not exist or is not current in Warehouse,
+         %     create it from Doc and update
+         % check if .mat is current - matches with the catalog file
+         if obj.MatFileWH.exist
+            if obj.areDatesMatch(obj.MatFileWH)
+               obj.downloadMat();
             else
-               obj.rsFromXml(1);
-               obj.h5FromRS();  % update the H5 file also
+               obj.matFromXml(1);
             end
          else
-            obj.rsFromXml(0);
-            obj.h5FromRS();  % update the H5 file also
+            obj.matFromXml(0);
          end
       end
       
-      function y = areDatesMatch(obj,wFile)
+      function setH5(obj)
+         % if h5 file does not exist or is not current in Warehouse,
+         %     create it from mat and update
+         % check if .h5 is current - matches with the catalog file
+         if obj.H5fileWH.exist
+            if obj.areDatesMatch(obj.H5fileWH)  
+               obj.downloadH5();
+            else
+               obj.h5fromMat(1);
+            end
+         else
+            obj.h5fromMat(0);
+         end
+      end
+      
+      function y = areDatesMatch(obj,whFile)
          NET.addAssembly('System');
          DT = System.DateTime();
          df1 = obj.CatalogFile.getProperty('getlastmodified');
          b1 = DT.Parse(df1);
-         df2 = wFile.getProperty('cataloglastmodified');
+         df2 = whFile.getProperty('cataloglastmodified');
          if isempty(df2)
             y = 0;
          else
@@ -81,55 +130,51 @@ classdef PrIMeModel < handle
          end
       end
       
-      function rsFromXml(obj,doesFileExist)
-         obj.RSobj = ReactionLab.ModelData.ReactionSet(obj.RSdoc);
-         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
-         rs = obj.RSobj;
-         save(localFilePath,'rs');
-         if file.isAuthorized
-            if doesFileExist
-               file.deletefile(1);
-            end
-            file.uploadfile(localFilePath,'new',1);
+      function downloadMat(obj)
+         obj.MatFileWH.download(obj.LocalDirPath);
+      end
+      
+      function downloadH5(obj)
+         txtFilePath = obj.H5fileWH.download(obj.LocalDirPath);
+         copyfile(txtFilePath,obj.H5pathLocal);
+         delete(txtFilePath);
+      end
+      
+      function matFromXml(obj,doesFileExist)
+         obj.xml2mat();
+         matObj = obj.MatObj; %#ok<NASGU>
+         save(obj.MatFileLocal,'matObj');
+         updateWHfile(obj,'mat',doesFileExist);
+      end
+      
+      function h5fromMat(obj,doesFileExist)
+         if isempty(obj.MatObj)
+            obj.MatObj();
          end
+         obj.MatObj.hdf5write(obj.H5pathLocal);
+         updateWHfile(obj,'h5',doesFileExist);
       end
       
-      function downloadBinary(obj,matFile)
-         matFile.download(obj.LocalDirPath,1);
-         s = load(obj.LocalDirPath);
-         f = filenames(s);
-         obj.RSobj = s.(f{1});
-         whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
-         whFile.download(obj.LocalDirPath,1);
-      end
-      
-      function h5FromRS(obj)
-         whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
-         localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
-         obj.RSobj.hdf5write(localFilePath);
+      function updateWHfile(obj,type,doesFileExist)
+         switch lower(type)
+            case {'mat' '.mat'}
+               whFile    = obj.MatFileWH;
+               localFile = obj.MatFileLocal;
+            case {'h5' '.h5' 'hdf5' '.hdf5'}
+               whFile    = obj.H5fileWH;
+               localFile = obj.H5pathLocal;
+         end
          if whFile.isAuthorized
-            if whFile.Exist
-               file.deletefile(1);
+            if doesFileExist
+               whFile.deletefile(1);
+            else
+               dirPath = fileparts(whFile.FilePath);
+               whFile.makedir(dirPath);
             end
-            file.uploadfile(localFilePath,'new',1);
+            whFile.uploadfile(localFile,'new',1);
+            dateVal = obj.CatalogFile.getProperty('getlastmodified');
+            whFile.setProperty('cataloglastmodified',dateVal);
          end
       end
-      
-      function loadDOM(obj)
-         docRS = ReactionLab.Util.gate2primeData('getDOM',{'primeId',obj.PrimeId});
-         obj.getIdFromXml(docRS);
-      end
-      
-%  may be for later
-%       function rsFromH5(obj)
-%          whFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
-%          localFilePath = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
-%          
-%          captionStruc = hdf5read(filePath,'/title');
-% 
-%          obj = ReactionLab.Util.PrIMeData.PrIMeModel(primeId);
-%          obj.setIdFromH5();
-%       end
    end
-    
 end
