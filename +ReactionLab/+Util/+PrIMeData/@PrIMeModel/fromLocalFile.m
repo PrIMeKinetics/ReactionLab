@@ -7,7 +7,7 @@ function fromLocalFile(obj,fileName,fileDirPath)
 
 % Copyright (c) 1999-2013 Michael Frenklach
 %       Created: March 28, 2013, myf 
-% Last modified: April  6, 2013, myf
+% Last modified: April  8, 2013, myf
 
 NET.addAssembly('System.Xml');
 
@@ -19,7 +19,7 @@ filePath = fullfile(fileDirPath,fileName);  % path to uploaded file
 switch lower(ext)
    case '.xml'  %  xml catalog file
       loadXml();
-   case '.h5'   %  HDF5 file
+   case {'.h5' '.hdf'}   %  HDF5 file
       loadH5();
    case '.mat'  %  ReactionSet object
       loadMat();

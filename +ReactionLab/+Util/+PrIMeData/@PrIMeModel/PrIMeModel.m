@@ -2,7 +2,7 @@ classdef PrIMeModel < handle
    
 % Copyright (c) 1999-2013 Michael Frenklach
 % Created: March 2013, myf
-% Last modified: April 6, 2013, myf
+% Last modified: April 8, 2013, myf
 
    properties
       XmlAssembly  = NET.addAssembly('System.Xml');
@@ -76,7 +76,7 @@ classdef PrIMeModel < handle
          obj.Title = lower(key(isstrprop(key,'alphanum')));
          obj.MatFileWH   = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
 %          obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
-         obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.txt');
+         obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.hdf');
          obj.MatFileLocal = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
          obj.H5pathLocal  = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
       end
@@ -135,9 +135,9 @@ classdef PrIMeModel < handle
       end
       
       function downloadH5(obj)
-         txtFilePath = obj.H5fileWH.download(obj.LocalDirPath);
-         copyfile(txtFilePath,obj.H5pathLocal);
-         delete(txtFilePath);
+         hdfFilePath = obj.H5fileWH.download(obj.LocalDirPath);
+         copyfile(hdfFilePath,obj.H5pathLocal);
+         delete(hdfFilePath);
       end
       
       function matFromXml(obj,doesFileExist)
@@ -160,7 +160,7 @@ classdef PrIMeModel < handle
             case {'mat' '.mat'}
                whFile    = obj.MatFileWH;
                localFile = obj.MatFileLocal;
-            case {'h5' '.h5' 'hdf5' '.hdf5'}
+            case {'h5' '.h5' 'hdf' '.hdf' 'hdf5' '.hdf5'}
                whFile    = obj.H5fileWH;
                localFile = obj.H5pathLocal;
          end
