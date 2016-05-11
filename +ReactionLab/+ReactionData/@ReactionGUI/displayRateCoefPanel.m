@@ -1,13 +1,31 @@
 function displayRateCoefPanel(rxnGUI,r)
 % displayRateCoefPanel(rxnGUIobj,ReactionObject)
 
-% Copyright 1999-2010 Michael Frenklach
-% $ Revision: 1.1 $
-% Last modified: November 21, 2010
+% Copyright 1999-2016 Michael Frenklach
+% Modified: November 21, 2010
+% Modified: December 30, 2015, myf: display individual k's of sum
+% Modified:    March 30, 2016, myf: modified the initial if block
 
-set(rxnGUI.Hrk.eqn,'String', r.Eq );
-rk = r.RateCoef;
+% set(rxnGUI.Hrk.eqn,'String', r.Eq );
+rk0 = r.RateCoef;
 
+indSelected = r.SelectedIndex;
+if isempty(indSelected) && rk0.isPdepedent
+   rk = rk0;
+else
+   if isempty(indSelected)
+      indSelected = 1;
+      r.SelectedIndex = indSelected;
+   end
+   rkListInTable = getappdata(rxnGUI.Hid.rkTable,'rkListInTable');
+   if length(rkListInTable) > 1
+      rk = rkListInTable{indSelected};
+   else
+      rk = rk0;
+   end
+end
+set(rxnGUI.Hrk.eqn,'String',rk.Eq);
+   
 % get pressure value
 if rk.isPdepedent
    indP = 1;
@@ -54,7 +72,7 @@ if indP == 0
    if lenT > 1
       setFields('');
       kF = rk.eval(T,rxnGUI.aUnits);
-      rxnGUI.displayRateCoefTable(r,T,kF,eqK);
+      rxnGUI.displayRateCoefTable(rk,T,kF,eqK);
    else % no P, array of T
       setFields( rk.eval(T,rxnGUI.aUnits) );
    end
@@ -72,11 +90,11 @@ else
          kF(:,i1) = rk.eval(T',rxnGUI.aUnits,P(i1),rxnGUI.pUnits);
       end
       kR = kF./repmat(eqK',1,lenP);
-      rxnGUI.displayRateCoefTable3d(r,T,kF,kR,P);
+      rxnGUI.displayRateCoefTable3d(rk,T,kF,kR,P);
    else
       setFields('');
       kF = rk.eval(T,rxnGUI.aUnits,P,rxnGUI.pUnits);
-      rxnGUI.displayRateCoefTable(r,T,kF,eqK,P);
+      rxnGUI.displayRateCoefTable(rk,T,kF,eqK,P);
    end
 end
 

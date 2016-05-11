@@ -2,11 +2,12 @@ function speWindowInitialize(speSubmit)
 % speWindowInitialize(SpeciesSubmitObj)
 % set the main window for species submission
 
-% Copyright 1999-2012 Michael Frenklach
+% Copyright 1999-2014 Michael Frenklach
 % % $Revision: 1.1 $
-% Last modified: September 19, 2012
+%      Modified: September 19, 2012
+% Last modified:      June 30, 2014, myf added .NET call
 
-wLink = ReactionLab.Util.PrIMeData.WarehouseLink();
+% wLink = ReactionLab.Util.PrIMeData.WarehouseLink();
 
 speWindowInitialize@ReactionLab.SpeciesData.SpeciesGUI(speSubmit);
 
@@ -184,6 +185,8 @@ drawnow;
    end
 
    function submitThis(hh,dd)
+      NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor.dll'));
+%      NET.addAssembly('ReactionLab.Util.PrimeEditor.dll');
       refresh([],[]);
      % species to submit
       curSpe = speSubmit.CurrentSpecies;
@@ -220,8 +223,9 @@ drawnow;
      % create a new XML doc for the new species
       speDoc = curSpe.spe2dom();
      % call submit window
-      g = wLink.GenericEditor(curSpe.Key,speDoc.OuterXml);
-      g.ShowDialog();
+%      g = wLink.GenericEditor(curSpe.Key,speDoc.OuterXml);
+      g = PrimeEditor.GenericEditor(curSpe.Key,speDoc.OuterXml);
+      ShowDialog(g);
      % process the result
       if ~isempty(g.resultOfSubmitfile.status)
          cc = textscan(char(g.resultOfSubmitfile.result),'%s','delimiter','/');

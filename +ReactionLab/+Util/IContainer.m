@@ -1,9 +1,9 @@
 classdef IContainer
 % container interface 
    
-% Copyright 2010-2012 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: April 9, 2012
+% Copyright 2010-2015 Michael Frenklach
+% Modified:   April 9, 2012
+% Modified: January 2, 2015, myf: added remove method
 
    properties (SetAccess = 'private')
       ValueClass = '';
@@ -47,6 +47,9 @@ classdef IContainer
       end
       function obj = clear(obj)
          obj.Container = {};
+      end
+      function obj = remove(obj,ind)
+         obj.Container(ind) = [];
       end
       
       function obj = add(obj,item)

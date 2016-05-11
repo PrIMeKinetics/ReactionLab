@@ -1,11 +1,12 @@
 function optvar = dom2optvar(optvarDoc,ovBndDoc)
 % OptimizationVariableObj = dom2optvar(optvarDoc,ovBndDoc)
 
-% Copyright 2008-2010 primekinetics.org
-% Created by: Xiaoqing You, UC Berkeley, November 19, 2008
-% Modified by: Xiaoqing You, UC Berkeley, January 23, 2009
-% Modified: Michael Frenklach, April 27, 2010 - new Matlab OOP
-% Modified: Michael Frenklach, May 21, 2010 - added variableBounds
+% Copyright 2008-2013 primekinetics.org
+%       Created: Xiaoqing You, UC Berkeley, November 19, 2008
+%      Modified: Xiaoqing You, UC Berkeley, January 23, 2009
+%      Modified: Michael Frenklach, April 27, 2010 - new Matlab OOP
+%      Modified: Michael Frenklach, May 21, 2010 - added variableBounds
+% Last Modified: Michael Frenklach, April 15, 2013 - new syntax for Bounds
 
 optvar = ReactionLab.ModelData.OptimizationVariable();
 optvar.PrimeId = strtrim(char(optvarDoc.DocumentElement.GetAttribute('primeID')));
@@ -45,10 +46,9 @@ optvar.BoundsRefPrimeId = strtrim(char(bndRefNode.GetAttribute('primeID')));
 boundsNode = ovBndDoc.GetElementsByTagName('bounds').Item(0);
 optvar.BoundsKind = strtrim(char(boundsNode.GetAttribute('kind')));
 upperNode = boundsNode.GetElementsByTagName('upper').Item(0);
-ubValue = str2double(char(upperNode.InnerText));
+optvar.UpperBound = str2double(char(upperNode.InnerText));
 lowerNode = boundsNode.GetElementsByTagName('lower').Item(0);
-lbValue = str2double(char(lowerNode.InnerText));
-optvar.Bounds = [lbValue ubValue];
+optvar.LowerBound = str2double(char(lowerNode.InnerText));
 
 additionalData = optvarDoc.GetElementsByTagName('additionalDataItem');
 len = double(additionalData.Count);

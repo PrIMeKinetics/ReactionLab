@@ -1,8 +1,8 @@
 classdef SpeciesList < ReactionLab.Util.IContainer
    
-% Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 2, 2012
+% Copyright 1999-2015 Michael Frenklach
+% Modified: January 2, 2012
+% Modified: January 2, 2015, myf: commented out display -- use .window
 
    properties (Dependent = true)
       Elements
@@ -15,11 +15,11 @@ classdef SpeciesList < ReactionLab.Util.IContainer
          obj = obj@ReactionLab.Util.IContainer(valClass);
       end
       
-      function display(obj)
-         if ~isempty(obj)
-            window(obj)
-         end
-      end
+%       function display(obj)
+%          if ~isempty(obj)
+%             window(obj)
+%          end
+%       end
       
       function window(obj)
          ReactionLab.SpeciesData.SpeciesDataGUI(obj);

@@ -1,47 +1,52 @@
 classdef PrIMeDataset < ReactionLab.Util.PrIMeData.PrIMeModel
    
 % Copyright (c) 1999-2013 Michael Frenklach
-%       Created: April 7, 2013, myf
-% Last modified: April 7, 2013, myf
+%       Created: April  7, 2013, myf
+% Last modified: April 15, 2013, myf
 
-   properties
-      ModelPrimeId = '';
-      ModelObj     = [];
+   properties (Dependent = true)
+      ModelPrimeId
+      ModelObj
    end
+
    
    methods
-      
-      function setIdFromXml(obj,doc)
-         obj.Doc = doc;
-         docRoot = doc.DocumentElement;
-         obj.PrimeId = strtrim(char(docRoot.GetAttribute('primeID')));
-         obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
-         obj.commonSettings();
-      end
-      
-      function setFromPrimeId(obj,primeId)
-         obj.PrimeId = primeId;
-         obj.CatalogFile = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId);
-         obj.Doc = obj.CatalogFile.loadXml();
-         obj.commonSettings();
-      end
-      
-      function commonSettings(obj)
-         docRoot = obj.Doc.DocumentElement;
-         preferredKey = docRoot.GetElementsByTagName('preferredKey').Item(0);
-         key = strtrim(char(preferredKey.InnerText));
-         obj.Title = lower(key(isstrprop(key,'alphanum')));
-         obj.MatFileWH   = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.mat');
-%          obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.h5');
-         obj.H5fileWH    = ReactionLab.Util.PrIMeData.WarehouseFile('','',obj.PrimeId,'.txt');
-         obj.MatFileLocal = fullfile(obj.LocalDirPath,[obj.PrimeId '.mat']);
-         obj.H5pathLocal  = fullfile(obj.LocalDirPath,[obj.PrimeId '.h5']);
-      end
-      
       function xml2mat(obj)
-      % specific to ReactionSet; need to be overloaded in derived classes
-         obj.MatObj = ReactionLab.ModelData.ReactionSet(obj.Doc);
+         obj.MatObj = ReactionLab.ModelData.Dataset(obj.Doc);
       end
+      
+      function y = get.ModelPrimeId(obj)
+         y = obj.MatObj.ReactionModelId;
+      end
+      
+      function y = get.ModelObj(obj)
+         modelObj = ReactionLab.Util.PrIMeData.PrIMeModel(obj.PWAcomponent);
+         y = modelObj.MatObj;
+      end
+      
+      function updateWHfile(obj,type,doesFileExist)
+         switch lower(type)
+            case {'mat' '.mat'}
+               whFile    = obj.MatFileWH;
+               localFile = obj.MatFileLocal;
+            case {'h5' '.h5' 'hdf' '.hdf' 'hdf5' '.hdf5'}
+               whFile    = obj.H5fileWH;
+               localFile = obj.H5pathLocal;
+         end
+         if whFile.isAuthorized
+            if doesFileExist
+               whFile.replacefile(1);
+            else
+               dirPath = fileparts(whFile.FilePath);
+               whFile.makedir(dirPath);
+               whFile.uploadfile(localFile,'new',1);
+            end
+            dateVal = obj.CatalogFile.getProperty('getlastmodified');
+            whFile.setProperty('cataloglastmodified',dateVal);
+         end
+      end
+      
       
    end
+   
 end

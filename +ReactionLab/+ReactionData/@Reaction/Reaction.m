@@ -1,14 +1,18 @@
 classdef Reaction < dynamicprops
    
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 1, 2011
+% Copyright 1999-2016 Michael Frenklach
+% Modified:  January  1, 2011
+% Modified: December 31, 2015, myf: added Direction property
+%                                   added flipDirection and
+%                                         isDirectionMatch methods
+%                                   changed display method
    
    properties
       PrimeId = '';
       Species = struct('key','','primeId','','coef',[]);
       RateCoef = [];
       Reversible = 1;  %  = 0 irreverssible
+      Direction = 'forward';  % 'reverse' otherwise
    end
    
    properties (SetAccess = 'private')
@@ -62,8 +66,13 @@ classdef Reaction < dynamicprops
       end
       
       function display(obj)
-         for i1 = 1:length(obj)
-            disp(obj(i1).Eq)
+         len = length(obj);
+         if len > 1
+            for i1 = 1:length(obj)
+               disp(obj(i1).Eq)
+            end
+         else
+            disp(obj)
          end
       end
    end

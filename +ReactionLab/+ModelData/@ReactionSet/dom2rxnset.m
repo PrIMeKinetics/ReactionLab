@@ -3,12 +3,17 @@ function rs = dom2rxnset(rs,modelDoc)
 %
 % read PrIMe modelXML file and convert it into ReactionSet object
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1 $
-% Last modified: November 18, 2010
+% Copyright 1999-2015 Michael Frenklach
+% Modified: November 18, 2010
+% Modified:     June  7, 2015, myf: added transportData to SpeciesObj
+% Modified:     June 17, 2015, myf: added explicit call to WarehouseLink obj
+% Modified: February 24, 2016, myf: added check and call for flipDirection
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
+
+wLink = ReactionLab.Util.PrIMeData.WarehouseLink;
+conn = wLink.conn;
 
 rs.PrimeId = char(modelDoc.DocumentElement.GetAttribute('primeID'));
 
@@ -31,6 +36,42 @@ for i1 = 1:numSpe
 %    speKey     = char(speciesRecord.GetAttribute('preferredKey'));
    spePrimeId = char(speciesRecord.GetAttribute('primeID'));
    speObj = ReactionLab.SpeciesData.Species(spePrimeId);
+   trNode = speciesRecord.GetElementsByTagName('transportDataLink').Item(0);
+   % get the transport data
+   if isempty(trNode)
+      % do nothing for now; eventually, load the tr00000000 file and get the pointer
+   else
+      trPrimeId = char(trNode.GetAttribute('primeID'));
+      filePath = ['depository/species/data/' spePrimeId '/' trPrimeId '.xml'];
+      trDoc = conn.Load(filePath).result;
+%       key = char(trDoc.GetElementsByTagName('preferredKey').Item(0).InnerText);
+      par = trDoc.GetElementsByTagName('parameter');
+      nPar = par.Count;
+      v = zeros(1,nPar);
+      for i2 = 1:nPar
+         attr = char(par.Item(i2-1).GetAttribute('name'));
+         switch attr
+            case 'geometry'
+               ind = 1;
+            case 'potentialWellDepth'
+               ind = 2;
+            case 'collisionDiameter'
+               ind = 3;
+            case 'dipoleMoment'
+               ind = 4;
+            case 'polarizability'
+               ind = 5;
+            case 'rotationalRelaxation'
+               ind = 6;
+            otherwise
+               error(['undefined attribute name ' attr]);
+         end
+         v(ind) = str2double(char(par.Item(i2-1).GetElementsByTagName('value').Item(0).InnerText));
+      end
+      speObj.AdditionalData(1).itemType = 'transportData';
+      speObj.AdditionalData(1).description = trPrimeId;
+      speObj.AdditionalData(1).content = v;
+   end
    speListObj = speListObj.add(speObj);
    waitbar(i1/numSpe,Hwait,['species  ' speObj.Key '  (' spePrimeId ')'],...
                             'Name',['Loading from PrIMe: ' rs.Title]       );
@@ -77,6 +118,11 @@ for i1 = 1:numRxn
       error(['no rate coefficient link for ' rxnPrimeId])
    end
    rxnObj.RateCoef = rk;
+   if ~isDirectionMatch(rxnObj)
+      rxnObj.flipDirection();
+      rxnObj.RateCoef = rxnObj.parseRateLinkNode(rateDataLink);
+   end
+   rxnObj.setRKeq();
    rxnObj.setThermo(rs.Species);
    rxnListObj = rxnListObj.add(rxnObj);
 end

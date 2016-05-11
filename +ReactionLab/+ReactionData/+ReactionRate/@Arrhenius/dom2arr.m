@@ -1,9 +1,9 @@
 function arr = dom2arr(arr,arrNode,rxnOrder)
 % ArrheniusObj = dom2arr(ArrheniusObj,DOMdocument,rxnOrder)
 
-% Copyright 2005-2010 Michael Frenklach
-% $ Revision 1 $
-% Last modified May 12, 2010
+% Copyright 2005-2015 Michael Frenklach
+% Modified  May 12, 2010
+% Modified June 16, 2015, myf: added units = 's' option
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -23,7 +23,9 @@ end
          case 'a'
             c = textscan(units,'%s','delimiter',',');
             s = c{1};
-            if    strncmpi(s{1},'cm',2) && ...
+            if length(s) == 1 && strcmpi(s{1},'s')
+               arr.A = value;
+            elseif    strncmpi(s{1},'cm',2) && ...
                any(strcmpi(s{2},{'mol' 'mole'})) && ...
                    strcmpi(s{3},'s')
                 arr.A = value;

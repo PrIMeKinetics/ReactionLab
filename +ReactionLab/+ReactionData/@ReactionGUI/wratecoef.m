@@ -1,5 +1,5 @@
 function wratecoef(r,action)
-%WTHERMO(reactionObject)
+% wratecoef(reactionObject)
 
 % Copyright 1999-2007 Michael Frenklach
 % $Revision: November 21, 2006$

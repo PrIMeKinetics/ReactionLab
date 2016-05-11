@@ -2,9 +2,9 @@ function rxnWindowInitialize(rxnGUI)
 % rxnWindowInitialize(rxnGUobj)
 % sets the main window for  reaction
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: November 20, 2010
+% Copyright 1999-2015 Michael Frenklach
+% Modified: November 20, 2010
+% Modified:  January  2, 2015, myf: fixed localFind
 
 Hfig = figure('Position',[50 200 650 490],...
    'NumberTitle', 'off',...
@@ -69,9 +69,11 @@ rxnRateCoefPanelInitialize(rxnGUI);
    function localFind(h,d)
       req = get(h,'string');
       if isempty(req)
+         rxnGUI.RxnList = rxnGUI.PrevRxnList;  % restore original
          rxnGUI.setWindowList();
          return
       end
+      rxnList = rxnGUI.RxnList;  % get the current rxn set
       c = textscan(req, '%s', 'delimiter', ' ,+=');
       rxnSpe2find = upper(c{:});
       rxnKeyList = get(Hlist,'string');
@@ -80,8 +82,10 @@ rxnRateCoefPanelInitialize(rxnGUI);
          c3 = strfind(c2,rxnSpe2find{i2});
          ind = find(cellfun(@isempty,c3));
          c2(ind) = [];
+         rxnList = rxnList.remove(ind);
       end
       set(Hlist,'String',c2,'Value',1);
+      rxnGUI.RxnList = rxnList;
       buttonGroup([],[]);
    end
 

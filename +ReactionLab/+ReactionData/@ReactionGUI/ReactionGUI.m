@@ -1,8 +1,8 @@
 classdef ReactionGUI < dynamicprops
 
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 1, 2011
+% Copyright 1999-2016 Michael Frenklach
+% Modified:  January  1, 2011
+% Modified: February 25, 2016, myf: added 'SelectedIndex'
    
    properties
       Hfig          = [];
@@ -82,6 +82,11 @@ classdef ReactionGUI < dynamicprops
       
       function setWindowList(obj)
          r = obj.RxnList.Values;
+         for i1 = 1:length(r)
+            if ~isprop(r(i1),'SelectedIndex');
+               r(i1).addprop('SelectedIndex');
+            end
+         end
          set(obj.Hlist,'String',{r.Eq});
       end
       

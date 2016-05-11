@@ -4,9 +4,9 @@ function setThermo(spe,speList,elemList,thList)
 %   into ThermoPP object for the formation rxn
 %   thList is containers.Map filles with Nasa7 objects
 
-% Copyright 2006-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 13, 2011
+% Copyright 2006-2015 Michael Frenklach
+% Modified:  January 13, 2011
+% Modified: February 22, 2015; myf lines 41-43
 
 th = ReactionLab.ThermoData.ThermoPP();
 
@@ -38,8 +38,8 @@ if length(refT)==1 && length(refP)==1
    th.RefState.T = refT;
    th.RefState.P = refP;
 else
-   disp([sTh.RefState.T])
-   disp([sTh.RefState.P])
+   disp(refT)
+   disp(refP)
    error(['Reference states of ref elems are not the same for ' spe.Key]);
 end
 

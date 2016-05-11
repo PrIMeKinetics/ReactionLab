@@ -33,7 +33,9 @@ classdef SpeciesIdentity < handle
    methods
       function obj = SpeciesIdentity(chemkinObj)
          if nargin > 0
-            [~,obj.MainSpeDict] = xlsread(which('+ReactionLab/+Util/+PrIMeData/+SpeciesDepot/defaultSpeciesDictionary.xlsx'));
+            [filestr,status]=urlwrite('http://primekinetics.org/tutorials/defaultSpeciesDictionary.xlsx','defaultSpeciesDictionary.xlsx');
+            [~,obj.MainSpeDict] = xlsread(filestr);
+            %[~,obj.MainSpeDict] = xlsread(which('+ReactionLab/+Util/+PrIMeData/+SpeciesDepot/defaultSpeciesDictionary.xlsx'));
             obj.addSpeDict('defaultSpeciesDictionary',obj.MainSpeDict,'primeId');
             obj.Chemkin = chemkinObj;
             obj.Hpanel = feval(chemkinObj.HpanelTemplate);

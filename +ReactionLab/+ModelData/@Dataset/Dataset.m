@@ -1,8 +1,10 @@
 classdef Dataset < dynamicprops
    
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 1, 2011
+% Copyright 1999-2013 Michael Frenklach
+%      modified: January  1, 2011, myf
+%      modified:   April 12, 2013, myf: added static method hdf2dataset
+%      modified:   April 15, 2013, myf: added property WithLinks
+% Last modified:   April 28, 2013, myf: switch to h5read
    
    properties
       PrimeId   = '';
@@ -10,12 +12,16 @@ classdef Dataset < dynamicprops
       Comment   = '';
       BiblioKey = '';
       BiblioId  = '';
-      ReactionModelId    = '';
-      ReactionModelTitle = '';
+      ModelId    = '';
+      ModelTitle = '';
       
       OptimizationVariables
       SurrogateModels
       Targets
+      
+      TargetToPredict = [];
+      
+      WithLinks = true;
       
       AdditionalData = struct('itemType',{},'description',{},'content',{});
    end
@@ -41,6 +47,11 @@ classdef Dataset < dynamicprops
          disp(obj)
 %          window(obj)
       end
+   end
+   
+   methods (Static)
+      y = hdf5read(filePath)
+      y =   h5read(filePath)
    end
    
 end

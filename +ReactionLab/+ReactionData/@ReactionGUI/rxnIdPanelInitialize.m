@@ -1,15 +1,19 @@
 function rxnIdPanelInitialize(rxnGUI)
 % rxnIdPanelInitialize(rxnGUIobj)
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: November 20, 2010
+% Copyright 1999-2016 Michael Frenklach
+% Modified:  November 20, 2010
+% Modified:   January  1, 2016, myf: added select column
+% Modified:  February 25, 2016, myf: comments out (for now) 'Flip reaction'
+% Modified: March 4, 2016, Jim Oreluk: made changed to graphics objects to
+% work in Matlab 2013. Original code is commented above changes. 
 
 Hpanel = uipanel('parent',rxnGUI.Hfig,...
    'units','pixels',...
    'Position', [350 20 290 400],...
    'Visible', 'on');
 rxnGUI.Hid.panel = Hpanel;
+bkColor = [0.9 0.9 0.9];
 
 rxnGUI.Hid.eqn = uicontrol('Parent',Hpanel,...
       'Style', 'text',...
@@ -65,18 +69,28 @@ rxnGUI.Hid.unitsA = uicontrol('Parent',Hpanel,'Visible','on',...
 rxnGUI.Hid.unitsE = uicontrol('Parent',Hpanel,'Visible','on',...
    'Style', 'popupmenu',...
    'String', rxnGUI.eUnitsList,...
-   'Position', [135 300 65 20],...   
+   'Position', [115 300 65 20],...   
    'HorizontalAlignment', 'center',...
    'Callback', @changeEunits);
-rxnGUI.Hid.rkTable = uitable('Parent',Hpanel,'Visible','on',...
+Htable = uitable('Parent',Hpanel,'Visible','on',...
    'Position',[0 50 287 250 ],...
-   'ColumnWidth', { 75 60 65 70},...
-   'ColumnFormat', {'numeric' 'numeric' 'numeric' 'char'},...
-   'ColumnName', {'A' 'n' 'E' ' '},...
+   'ColumnWidth', { 75 40 65 64 40},...
+   'ColumnFormat', {'numeric' 'numeric' 'numeric' 'char' 'logical'},...
+   'ColumnEditable', [ false false false false true ], ...
+   'ColumnName', {'A' 'n' 'E' ' ' 'select'},...
    'RowName', [] ,...
-   'Data', {},...
-   'CellSelectionCallback', @localTableAction );
-
+   'Data', {} ,...
+   'CellEditCallback', @selectTableItem );
+rxnGUI.Hid.rkTable = Htable;
+Haction = uicontrol('Parent',Hpanel,...
+   'Style', 'popupmenu',...
+   'Position', [224 305 60 20],...
+   'BackgroundColor', bkColor,...
+   'ForegroundColor', 'blue',...
+   'String',{'Action' 'Show xml' 'Compare' 'Compare all' ...
+                      'Reverse k' 'Flip reaction' 'Clear all'},...
+   'Callback', @selectTableAction );
+rxnGUI.Hid.Action = Haction;
 
 HfoPanel = uipanel('Visible', 'off',...
    'parent',Hpanel,...
@@ -126,18 +140,64 @@ rxnGUI.Hid.foParam = uicontrol('Visible','off',...
          {'primeId',get(rxnGUI.Hid.rxnId,'String'),get(hh,'String')});
    end
 
-   function localTableAction(hh,dd)
-   % display the individual rxn rate source file
-      ind = dd.Indices;
-      if ~isempty(ind) && ind(2) == 4
-         primeIds = get(hh,'UserData');
-         ReactionLab.Util.gate2primeData('show',...
-            {'primeId',get(rxnGUI.Hid.rxnId,'String'),primeIds{ind(1)}});
+    function selectTableAction(hh,dd)
+        %data = Htable.Data;
+        data = get(Htable, 'Data');
+        ind = find([data{:,5}]);  % index(es) of selected rk's in table
+        % if isempty(ind) && (hh.Value~=4 && hh.Value~=6)
+        if isempty(ind) && (get(hh, 'Value') ~=4 && get(hh, 'Value') ~=6)
+            return;
+        end
+        primeIds = get(Htable,'UserData');
+        % switch hh.Value
+        switch get(hh, 'Value')
+            case 1
+                return;
+            case 2  % show xml file
+                ReactionLab.Util.gate2primeData('show',...
+                  {'primeId',get(rxnGUI.Hid.rxnId,'String'),primeIds{ind}});
+          case 3  % plot comparing selected rk's
+              ii = find([data{:,5}]);
+              if length(ii) == 1
+                  rxnGUI.displayRateCoefPanel(rxnGUI.CurrentReaction);
+              else
+                  rxnGUI.compareRK(ii);
+              end
+          case 4  % compare all rk's from the table
+              nRK = size(data,1);
+              if nRK == 1
+                  rxnGUI.displayRateCoefPanel(rxnGUI.CurrentReaction);
+              else
+                  rxnGUI.compareRK(1:size(data,1));
+              end
+          case 5  % reverse rk direction
+              rxnGUI.flipRKdirection(ind);
+          case 6  % reverse reaction direction
+              %             rxnGUI.CurrentReaction.flipDirection();
+              %             rxnGUI.displayIdPanel(rxnGUI.CurrentReaction)
+          case 7  % clear all
+              % Htable.Data(:,5) = {false};
+              hData = get(Htable, 'Data');
+              hData(:,5) = {false};
+              set(Htable, 'Data', hData);
       end
+
+%       drawnow;
    end
 
-   function rxnReverse(hh,dd)
-      
+   function selectTableItem(hh,dd)
+      %rxnGUI.CurrentReaction.SelectedIndex =find([hh.Data{:,5}]);
+      hData = get(hh, 'Data');
+      rxnGUI.CurrentReaction.SelectedIndex = find([hData{:,5}]);
+      % if Haction.Value ~= 2  % proceed only for 'Show xml'
+      if get(Haction, 'Value') ~= 2
+          return
+      end
+      ind = dd.Indices;
+      if isempty(ind)
+         return;
+      end
+      selectTableAction(Haction,[]);
    end
 
 end

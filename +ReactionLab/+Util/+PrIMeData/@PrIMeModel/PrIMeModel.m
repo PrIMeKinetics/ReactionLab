@@ -1,8 +1,10 @@
 classdef PrIMeModel < handle
    
-% Copyright (c) 1999-2013 Michael Frenklach
-% Created: March 2013, myf
-% Last modified: April 8, 2013, myf
+% Copyright (c) 1999-2015 Michael Frenklach
+%  Created: March 2013, myf
+% Modified:   April  8, 2013, myf
+% Modified: Jenuary  5, 2015, myf
+% Modified:    JUne  8, 2015, myf: commented out "deletefile"
 
    properties
       XmlAssembly  = NET.addAssembly('System.Xml');
@@ -82,7 +84,6 @@ classdef PrIMeModel < handle
       end
       
       function xml2mat(obj)
-      % specific to ReactionSet; need to be overloaded in derived classes
          obj.MatObj = ReactionLab.ModelData.ReactionSet(obj.Doc);
       end
       
@@ -144,7 +145,7 @@ classdef PrIMeModel < handle
          obj.xml2mat();
          matObj = obj.MatObj; %#ok<NASGU>
          save(obj.MatFileLocal,'matObj');
-         updateWHfile(obj,'mat',doesFileExist);
+         obj.updateWHfile('mat',doesFileExist);
       end
       
       function h5fromMat(obj,doesFileExist)
@@ -166,7 +167,7 @@ classdef PrIMeModel < handle
          end
          if whFile.isAuthorized
             if doesFileExist
-               whFile.deletefile(1);
+%                whFile.deletefile(1);
             else
                dirPath = fileparts(whFile.FilePath);
                whFile.makedir(dirPath);

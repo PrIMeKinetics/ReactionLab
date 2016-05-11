@@ -7,7 +7,7 @@ function fromLocalFile(obj,fileName,fileDirPath)
 
 % Copyright (c) 1999-2013 Michael Frenklach
 %       Created: March 28, 2013, myf 
-% Last modified: April  8, 2013, myf
+% Last modified: April 16, 2013, myf
 
 NET.addAssembly('System.Xml');
 
@@ -37,9 +37,11 @@ end
    end
 
    function loadH5()
-      outputFilePath = fullfile(obj.LocalDirPath,[name '.h5']);
-      copyfile(filePath,outputFilePath,'f');
-      fileattrib(outputFilePath,'+w');
+      if ~strcmpi(fileDirPath,obj.LocalDirPath)
+         outputFilePath = fullfile(obj.LocalDirPath,[name '.h5']);
+         copyfile(filePath,outputFilePath,'f');
+         fileattrib(outputFilePath,'+w');
+      end
    end
 
    function loadMat()

@@ -3,9 +3,9 @@ function rk = parseRateLinkNode(rxn,rateLinkNode)
 %                                                               
 % parse reactionRate links
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1 $
-% Last modified: May 12, 2010
+% Copyright 1999-2016 Michael Frenklach
+% Modified: May 12, 2010
+% Modified: Dec 29, 2015, myf: remove unnecessary try-catch
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -18,20 +18,12 @@ if isa(rateLinkNode,'System.Xml.XmlElement')
    return
 end
 
-try
-    numLinks = double(rateLinkNode.getLength);
-catch
-    numLinks = double(rateLinkNode.Count);
-end
-if     numLinks == 0
+numLinks = double(rateLinkNode.Count);
+if numLinks == 0
    rk = [];
    return
 elseif numLinks == 1
-    if ismethod(rateLinkNode,'Item')
-        rk = singleRKrecord(rateLinkNode.Item(0));
-    else
-        rk = singleRKrecord(rateLinkNode.item(0));
-    end
+   rk = singleRKrecord(rateLinkNode.Item(0));
 else                     %  'sum'
    rk = ReactionLab.ReactionData.ReactionRate.Sum();
    rk.RxnPrimeId = rxnPrimeId;
@@ -42,11 +34,7 @@ end
 
 
    function rk = singleRKrecord(rkLinkNode)
-      try
-          rkPrimeId = char(rkLinkNode.getAttribute('primeID'));
-      catch
-          rkPrimeId = char(rkLinkNode.GetAttribute('primeID'));
-      end
+      rkPrimeId = char(rkLinkNode.GetAttribute('primeID'));
       rkDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',rxnPrimeId,rkPrimeId});
       rkType = char(rkDoc.DocumentElement.GetAttribute('rateLawType'));
       switch lower(rkType)

@@ -1,12 +1,15 @@
-classdef OptimizationVariable
+classdef OptimizationVariable < handle
 
-% Copyright 2008-2011 primekinetics.org
+% Copyright 2008-2014 primekinetics.org
 % Created by: Xiaoqing You, UC Berkeley, November 19, 2008
 % Modified by: Xiaoqing You, UC Berkeley, January 23, 2009
 % Modified: Michael Frenklach, April 27, 2010 - new Matlab OOP
 % Modified: Michael Frenklach, May 21, 2010 - added variableBounds
+% Modified: April 12, 2013, myf: added stitic method hdf2optvar
+% Modified: April 15, 2013, myf: modified Bounds
+% Modified: April 28, 2013, myf: switch to h5read
 
-  properties
+   properties
       Key        = ''
       PrimeId    = '';
       Type       = '';
@@ -15,13 +18,20 @@ classdef OptimizationVariable
       Value      = [];
       Units      = '';
       Links      = {};    % {primary; secondary}
-      Bounds     = [];
+      LowerBound  = [];
+      UpperBound  = [];
       BoundsKind = '';
       BoundsPrimeId = '';
       BoundsRef  = '';
       BoundsRefPrimeId = '';
       Description = '';
+      Center = [];
+      Span   = [];
       AdditionalData = struct('itemType',{},'description',{},'content',{});
+   end
+   
+   properties (Dependent)
+      Bounds               % [LB UB]
    end
 
 
@@ -40,6 +50,15 @@ classdef OptimizationVariable
          end
       end
       
+      function y = get.Bounds(obj)
+         y = [obj.LowerBound obj.UpperBound];
+      end
+      
+      function set.Bounds(obj,bnds)
+         obj.LowerBound = min(bnds);
+         obj.UpperBound = max(bnds);
+      end
+      
       function display(obj)
          disp(obj)
 %          window(obj)
@@ -49,6 +68,8 @@ classdef OptimizationVariable
 
    methods (Static)
       obj = dom2optvar(ovDoc,ovBndDoc)
+      y = hdf5read(filePath,indLinks)
+      y =   h5read(filePath,indLinks)
       
       function y = loadDoc(ovDoc,ovBndDoc)
          if ~isempty(ovDoc)

@@ -1,8 +1,9 @@
 classdef ReactionList < ReactionLab.Util.IContainer
    
-% Copyright 1999-2011 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: January 1, 2011
+% Copyright 1999-2016 Michael Frenklach
+% Modified:   January 1, 2011
+% Modified:   January 2, 2015, myf: commented out display -- use .window
+% Modified: December 31, 2015, myf: added isDirectionMatch method
    
    
    methods
@@ -12,15 +13,12 @@ classdef ReactionList < ReactionLab.Util.IContainer
          obj = obj@ReactionLab.Util.IContainer(valClass);
       end
       
-      function display(obj)
-         if isempty(obj)
-         elseif length(obj) == 1
-            disp(obj)
-         else
-            items = obj.Values;
-            for i1 = 1:length(items)
-               display(items(i1));
-            end
+      function y = isDirectionMatch(obj)
+         rr = obj.Values;
+         y = 1;
+         for i1 = 1:obj.Length
+            y = y * rr(i1).isDirectionMatch();
+            if ~y, return, end
          end
       end
       

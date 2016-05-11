@@ -1,11 +1,12 @@
 function trg = dom2trg(trgDoc)
 % trgObj = dom2trg(TargetDoc)
 
-% Copyright 2008-2010 primekinetics.org
-% Created by: Xiaoqing You, UC Berkeley, November 19, 2008
-% Modified by: Xiaoqing You, UC Berkeley, January 23, 2009
-% Last Modified: Michael Frenklach, April 27, 2010 - new Matlab OOP
-
+% Copyright 2008-2013 primekinetics.org
+%       Created: Xiaoqing You, UC Berkeley, November 19, 2008
+%      Modified: Xiaoqing You, UC Berkeley, January 23, 2009
+%       odified: Michael Frenklach, April 27, 2010 - new Matlab OOP
+% Last Modified: Michael Frenklach, April 15, 2013 - new syntax for Bounds
+% Last Modified: Matt Speight, July 23, 2013 - lines 66-71
 trg = ReactionLab.ModelData.Target();
 trg.PrimeId = char(trgDoc.DocumentElement.GetAttribute('primeID'));
 trg.Type = char(trgDoc.DocumentElement.GetAttribute('type'));
@@ -62,15 +63,20 @@ elseif strcmpi(type,'actual')
 else
     error(['wrong value type: ' type]);
 end
+% edited by wms 
+if strcmp(trg.Label,'t_ign')
+   trg.Units = [char(181) 's'];
+   trgValue=ReactionLab.Units.units2units(trgValue,strtrim(char(propertyNode.GetAttribute('units'))),'microsec');
+end
+% end edit
 trg.Value = trgValue;
 
 boundsNode = observableNode.GetElementsByTagName('bounds').Item(0);
 trg.BoundsKind = strtrim(char(boundsNode.GetAttribute('kind')));
 upperNode = boundsNode.GetElementsByTagName('upper').Item(0);
-ubValue = str2double(char(upperNode.InnerText));
+trg.UpperBound = str2double(char(upperNode.InnerText));
 lowerNode = boundsNode.GetElementsByTagName('lower').Item(0);
-lbValue = str2double(char(lowerNode.InnerText));
-trg.Bounds = [lbValue ubValue];
+trg.LowerBound = str2double(char(lowerNode.InnerText));
 
 additionalData = trgDoc.GetElementsByTagName('additionalDataItem');
 len = double(additionalData.Count);

@@ -3,9 +3,9 @@ function ds = dom2dataset(ds,dsDoc)
 %
 % read PrIMe modelXML file and convert it into Dataset object
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1 $
-% Last modified: July 8, 2010
+% Copyright 1999-2013 Michael Frenklach
+%      modified:  July 28, 2010, myf
+% Last modified: April 15, 2013, myf
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -13,15 +13,15 @@ import System.Xml.*;
 % ReactionSet links
 modelNode = dsDoc.GetElementsByTagName('modelLink').Item(0);
 key = char(modelNode.GetAttribute('preferredKey'));
-ds.ReactionModelTitle = key;
-ds.ReactionModelId = char(modelNode.GetAttribute('primeID'));
+ds.ModelTitle = key;
+ds.ModelId = char(modelNode.GetAttribute('primeID'));
 
 % dataset primeId
 ds.PrimeId = char(dsDoc.DocumentElement.GetAttribute('primeID'));
 ds.Title = char(dsDoc.GetElementsByTagName('preferredKey').Item(0).InnerText);
 biblioNode = dsDoc.GetElementsByTagName('bibliographyLink').Item(0);
 ds.BiblioKey = char(biblioNode.GetAttribute('preferredKey'));
-ss.BiblioId  = char(biblioNode.GetAttribute('primeID'));
+ds.BiblioId  = char(biblioNode.GetAttribute('primeID'));
 
 % surrogate models and targets
 smSetNode = dsDoc.GetElementsByTagName('surrogateModelSet');

@@ -2,14 +2,17 @@ function authenticate(wLink)
 % authenticate(WarehouseLinkObj)
 % check the PrIMe user database for the username and password
 
-% Copyright 1999-2013 Michael Frenklach
-% Created: March 14, 2013
-% Last modified: April 1, 2013
+% Copyright 1999-2015 Michael Frenklach
+%  Created:     March 14, 2013, myf
+% Modified:     April  1, 2013, myf
+% Modified: September 10, 2014, myf: remove set|getappdata
+% Modified:  February 22, 2015, myf: fixed typos
 
 userName     = wLink.Username;
 userPassword = wLink.Password;
 if isempty(char(userName)) || isempty(char(userPassword))
-   setappdata(wLink.conn,'Authorized',false);
+   wLink.Authenticated = false;
+%    setappdata(wLink.conn,'Authorized',false);
    return
 end
 
@@ -27,4 +30,5 @@ a = http.ResponseText;
 [~,b] = strtok(strtok(char(a)),':');
 b(1) = [];
 
-setappdata(wLink.conn,'Authorized',logical(str2num(b)));
+wLink.Authenticated = logical(str2num(b));
+% setappdata(wLink.conn,'Authorized',logical(str2num(b)));

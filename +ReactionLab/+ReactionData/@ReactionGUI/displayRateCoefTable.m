@@ -1,10 +1,11 @@
-function displayRateCoefTable(rxnGUI,r,T,kF,eqK,P)
-% displayRateCoefTable(rxnGUIobj,ReactionObj,T,kF,eqK,P)
+function displayRateCoefTable(rxnGUI,rk,T,kF,eqK,P)
+% displayRateCoefTable(rxnGUIobj,RateCoefObj,T,kF,eqK,P)
 %
 % displays a table of reaction rate coefficients
 
-% Copyright 1999-2013 Michael Frenklach
-% Last modified: February 25, 2013
+% Copyright 1999-2016 Michael Frenklach
+% Modified: February 25, 2013
+% Modified: December 30, 2015, myf: changed r.Eq to rk.Eq
 
 au = rxnGUI.aUnits;
 
@@ -36,7 +37,7 @@ pos = [200 250 325 hRows];
 Hfig = figure(...
    'Position', pos,...
    'NumberTitle', 'off',...
-   'Name', r.Eq,...
+   'Name', rk.Eq,...
    'Tag', 'rateCoefTable',...
    'MenuBar', 'none',...
    'Resize', 'off');
@@ -69,14 +70,14 @@ uicontrol('Parent',Hfig,...
    'String', str );
 
    function plotVsT(h,d,y,yLabel)
-      figure('NumberTitle','off', 'Name',r.Eq);
+      figure('NumberTitle','off', 'Name',rk.Eq);
       semilogy(1./T,y,'o');
       xlabel('1/T [1/K]')
       ylabel(yLabel)
    end
 
    function plotVsP(h,d,y,yLabel)
-      figure('NumberTitle','off', 'Name',r.Eq);
+      figure('NumberTitle','off', 'Name',rk.Eq);
       loglog(P,y,'o');
       xlabel(['P  [' rxnGUI.pUnits ']'])
       ylabel(yLabel)

@@ -2,8 +2,9 @@ function y = get_lastid(conn,dirPath)
 % y = get_lastid(conn,dirPath)
 %     new Matlab
 
-% Copyright 1999-2010 Michael Frenklach
-% Last Modified: January 17, 2010
+% Copyright 1999-2015 Michael Frenklach
+% Modified: January 17, 2010
+% Modified:   April  7, 2015
 
 out = conn.ListFiles(dirPath);
 if ~out.status
@@ -12,7 +13,7 @@ end
 
 list = out.result;
 count = 0;
-for i1 = 1:list.Count
+for i1 = 1:list.Length
    fileName = char(list(i1));
    if isempty(strfind(fileName,'attic'))
       s = strtok(fileName,'.xml');  % primeId

@@ -1,8 +1,10 @@
 classdef WarehouseLink < handle
    
-% Copyright 1999-2013 Michael Frenklach
-% Created: March 20, 2013
-% Last modified: April 4, 2013, myf
+% Copyright 1999-2015 Michael Frenklach
+%  Created:     March 20, 2013
+% Modified:     April  4, 2013, myf
+% Modified: September 10, 2014, myf: removed getappdata in get.Authorized
+% Modified:  February 22, 2015, myf: changed get.Authorized and isAuthorized
 
    properties
       PrimeWebDAVclient = NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
@@ -10,9 +12,13 @@ classdef WarehouseLink < handle
       conn = PrimeKinetics.PrimeHandle.PrimeConnection('','');
       WebServiceClient  = NET.addAssembly(which('+ReactionLab\+Util\PrimeWSClient.dll'));
       ws = PrimeWSClient.PrimeHandleService.PrimeHandle();
-      PrimeEditor_pub = NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor_pub.dll'));
+      PrimeEditor_pub = NET.addAssembly(which('+ReactionLab\+Util\PrimeEditor.dll'));
       GenericEditor = @PrimeEditor.GenericEditor;
       PrimeHandle_local = NET.addAssembly(which('+ReactionLab\+Util\PrimeHandle.dll'));
+   end
+   
+   properties (SetAccess = private)
+      Authenticated
    end
    
    properties (Dependent = true)
@@ -43,9 +49,11 @@ classdef WarehouseLink < handle
          obj.conn.Password = pw;
       end
       function y = get.Authorized(obj)
-         y = getappdata(obj.conn,'Authorized');
-         if isempty(y)
-            y = false;
+         y = obj.Authenticated;
+         if isempty(y) || ~y
+            obj.loginWindow();
+%             obj.authenticate();
+            y = obj.Authenticated;
          end
       end
       
@@ -86,10 +94,11 @@ classdef WarehouseLink < handle
          end
       end
       function y = isAuthorized(obj)
-         if ~obj.Authorized
-            obj.loginWindow();
-         end
          y = obj.Authorized;
+%          if ~obj.Authorized
+%             obj.loginWindow();
+%          end
+%          y = obj.Authorized;
       end
    end
 

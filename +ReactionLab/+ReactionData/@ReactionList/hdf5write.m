@@ -11,9 +11,10 @@ function hdf5write(rxnList,hdf5path)
 
 
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1 $
-% Last modified: November 20, 2010
+% Copyright 1999-2015 Michael Frenklach
+% Modified: November 20, 2010
+% Modified:     June 19, 2015, myf: added to 'if' on line 79;
+%                        treated separately dimentions of sforw and sRev
 
 rxn = rxnList.Values;
 
@@ -76,7 +77,7 @@ for iRxn = 1:nRxn
    parseRK(kF);
    
    rkLink = kF.PrimeId;
-   if isempty(rkLink)
+   if isempty(rkLink) && isa(kF,'ReactionLab.Util.IContainer')
       rks = kF.Values;
       rkLink = {};
       for i2 = 1:length(rks)
@@ -84,23 +85,36 @@ for iRxn = 1:nRxn
       end
    end
    try
-       hdf5write(hdf5path,['/reactionData/rateCoefLinks/' rxn(iRxn).PrimeId],rkLink,...
-                           'WriteMode', 'append'                                      );
+      hdf5write(hdf5path,['/reactionData/rateCoefLinks/' rxn(iRxn).PrimeId],rkLink,...
+                          'WriteMode', 'append'                                      );
    end
    waitbar(iRxn/nRxn);
 end
 close(Hwait);
 
 % reaction stoichiometry
-nStoich = max(size(mex_sForw,1),size(mex_sRev,1));
-forwStoich = zeros(nRxn,nStoich,'uint16');
- revStoich = zeros(nRxn,nStoich,'uint16');
+% nStoich = max(size(mex_sForw,1),size(mex_sRev,1));
+% forwStoich = zeros(nRxn,nStoich,'uint16');
+%  revStoich = zeros(nRxn,nStoich,'uint16');
+% for i1 = 1:nRxn
+%    for j1 = 1:nStoich
+%       forwStoich(i1,j1) = uint16(mex_sForw(j1,i1));
+%        revStoich(i1,j1) = uint16(mex_sRev(j1,i1) );
+%    end
+% end
+nForwStoich = max(size(mex_sForw,1));
+ nRevStoich = max(size(mex_sRev, 1));
+forwStoich = zeros(nRxn,nForwStoich,'uint16');
+ revStoich = zeros(nRxn,nRevStoich,'uint16');
 for i1 = 1:nRxn
-   for j1 = 1:nStoich
+   for j1 = 1:nForwStoich
       forwStoich(i1,j1) = uint16(mex_sForw(j1,i1));
-       revStoich(i1,j1) = uint16(mex_sRev(j1,i1) );
+   end
+   for j2 = 1:nRevStoich
+       revStoich(i1,j2) = uint16(mex_sRev(j2,i1));
    end
 end
+
 hdf5write(hdf5path,'/reactionData/reactantSpeciesIndex',forwStoich',...
                    '/reactionData/productSpeciesIndex', revStoich', ...
                    '/reactionData/isReversible',     uint8([rxn.Reversible]'),...

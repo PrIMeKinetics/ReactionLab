@@ -7,8 +7,9 @@ classdef WarehouseFile < ReactionLab.Util.PrIMeData.WarehouseLink
 % WarehouseFile(''      ,''      ,'d00000003','.mat|.h5')
 
 % Copyright (c) 1999-2013 Michael Frenklach
-%      modified: March 21, 2013
-% Last modified: April  5, 2013, myf
+% Modified:   March 21, 2013
+% Modified:   April  5, 2013, myf
+% Modified: January  4, 2015, myf: added 'a' in if-else for dataAttributes
 
    properties
       PrimeId    = '';
@@ -39,6 +40,8 @@ classdef WarehouseFile < ReactionLab.Util.PrIMeData.WarehouseLink
                filePath = [filePath 'models'];
             elseif primeId(1) == 'd'
                filePath = [filePath 'datasets'];
+            elseif primeId(1) == 'a'
+               filePath = [filePath 'dataAttributes'];
             else
                error(['undefined request: ' primeId])
             end
