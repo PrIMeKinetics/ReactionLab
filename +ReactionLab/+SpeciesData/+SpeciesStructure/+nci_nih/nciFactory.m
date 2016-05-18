@@ -1,13 +1,14 @@
 classdef nciFactory < ReactionLab.SpeciesData.SpeciesStructure.MolGeomFactory
    
-% Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: September 11, 2012
+% Copyright 1999-2016 Michael Frenklach
+% Modified: September 11, 2012
+% Modified:       May 18, 2016, myf: updated Url
+
    
    properties
 %       SysAssembly = NET.addAssembly('System');
 %       WebClient = System.Net.WebClient;
-      Url = 'http://cactus.nci.nih.gov/chemical/structure/';
+      Url = 'https://cactus.nci.nih.gov/chemical/structure/';
    end
    
    
