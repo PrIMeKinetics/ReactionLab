@@ -3,9 +3,9 @@ function displayThermoTable(rxnGUI,r,T)
 %
 % displays a table of reaction thermo
 
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.1 $
-% Last modified: November 21, 2010
+% Copyright 1999-2016 Michael Frenklach
+% Modified: November 21, 2010
+% Modified:     June  2, 2016, myf: fixed typo with plotting Keq
 
 hu = rxnGUI.hUnits;
 su = rxnGUI.sUnits;
@@ -38,7 +38,7 @@ uimenu('Parent', Hplot,...
    'Callback', { @localPlot deltaG ['\DeltaG  [' strrep(hu,'_',' ') ']']} );
 uimenu('Parent', Hplot,...
    'Label', 'Keq',...
-   'Callback', { @localPlotKeq deltaG ['Keq  [' strrep(u,'_',' ') ']']} );
+   'Callback', { @localPlotKeq eqK ['Keq  [' strrep(u,'_',' ') ']']} );
 
 uitable('Parent',Hfig,'Visible','on',...
         'Position',[0 0 402 hRows-30],...
