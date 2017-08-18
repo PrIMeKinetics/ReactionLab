@@ -1,6 +1,8 @@
 function y = gate2primeData(varargin)
 % function y = gate2primeData(strAction, cellArrArguments)
 %
+%   for the DLR site
+%
 % This is the application gateway to PrIMe data. It is an interface
 % through which applications can access the data stored in the PrIMe Warehouse
 % without having explicit information on the Warehouse structure, file formats,
@@ -37,8 +39,6 @@ function y = gate2primeData(varargin)
 NET.addAssembly('System.Xml');
 import System.Xml.*;
 
-NET.addAssembly(which('+ReactionLab\+Util\PrimeWebDavClient.dll'));
-
 if nargin == 0
    y = { 'Current methods are:'
          ' show'
@@ -49,9 +49,6 @@ if nargin == 0
          ' getAtticFileList' };
    return
 end
-
-conn = PrimeKinetics.PrimeHandle.PrimeConnection('','');
-Common = PrimeKinetics.PrimeHandle.Data.Common;
     
 action = varargin{1};
 if ischar(action)
@@ -68,7 +65,7 @@ if ischar(action)
          y = char(PrimeKinetics.PrimeHandle.Data.Common.GetPreferredKey(DOMObj));
       case 'getDOM'
          if strcmpi(varargin{2}{1},'element')
-            filePath = ['depository/elements/catalog/' lower(varargin{2}{2}) '.xml'];
+            filePath = ['http://warehouse.cki-know.org/depository/elements/catalog/' lower(varargin{2}{2}) '.xml'];
          else
             filePath = getPath(varargin{2});
          end
@@ -77,7 +74,7 @@ if ischar(action)
          var2 = varargin{2};
          [a,b] = fileparts(getPath(var2(1:2)));
          dataDirPath = [fileparts(a) '/data/' b '/'];
-         y = setdiff(list2cell(conn.ListFiles(dataDirPath).result),'_attic/');
+%          y = setdiff(list2cell(conn.ListFiles(dataDirPath).result),'_attic/');
          if ~isempty(y) && length(var2) > 2
             y = y(strncmpi(y,var2{3},length(var2{3})));
          end
@@ -85,7 +82,7 @@ if ischar(action)
          var2 = varargin{2};
          [a,b] = fileparts(getPath(var2(1:2)));
          dataDirPath = [fileparts(a) '/data/' b '/_attic/'];
-         y = list2cell(conn.ListFiles(dataDirPath).result);
+%          y = list2cell(conn.ListFiles(dataDirPath).result);
          if ~isempty(y) && length(var2) > 2
             y = y(strncmpi(y,var2{3},length(var2{3})));
          end
@@ -105,21 +102,55 @@ end
       if nArgs < 2  ||  ~strcmpi(arguments{1},'primeID')
          error('undefined input')
       end
+      catalog = arguments{2};   %  catalogName
+      s1 = lower(catalog(1));   %  firstLetter
+      switch s1
+         case 'b'
+            cat = 'bibliography';
+         case 'e'
+            cat = 'elements';
+         case 's'
+            cat = 'species';
+         case 'r'
+            cat = 'reactions';
+         case 'm'
+            cat = 'models';
+         case 'd'
+            cat = 'datasets';
+         case 'x'
+            cat = 'experiments';
+         case 'a'
+            cat = 'dataAttributes';
+         otherwise
+            error(['undefined catalog ' s1]);
+      end
+            
       if nArgs == 2
-         filePath = char(Common.PrimeID2path(arguments{2}));
+         filePath = ['http://warehouse.cki-know.org/depository/' cat '/catalog/' arguments{2} '.xml'];
+%          filePath = char(Common.PrimeID2path(arguments{2}));
       elseif nArgs == 3
-         filePath = char(Common.PrimeID2path(arguments{2:3}));
+         filePath = ['http://warehouse.cki-know.org/depository/' cat '/data/' arguments{2} '/' arguments{3}  '.xml'];
+%          filePath = char(Common.PrimeID2path(arguments{2:3}));
       else
          error(['undefined number of arguments ' int2str(nArgs)])
       end
    end
 
    function doc = getDOM(filePath)
-      a2 = conn.Load(filePath);
-      if ~a2.status
-         error(['could not download ' filePath])
+      docStr = webread(filePath,weboptions('ContentType','text'));
+      if docStr(1) ~= '<'
+         [~,docStr] = strtok(docStr,'<');
       end
-      doc = a2.result;
+      doc = System.Xml.XmlDocument;
+      doc.LoadXml(docStr);
+      
+%       doc = webread(filePath,weboptions('ContentType','xmldom'));
+      
+%       a2 = conn.Load(filePath);
+%       if ~a2.status
+%          error(['could not download ' filePath])
+%       end
+%       doc = a2.result;
    end
 
    function primeId = getBestCurrentId(varargin)
