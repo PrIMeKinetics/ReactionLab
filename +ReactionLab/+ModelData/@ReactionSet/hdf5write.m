@@ -10,6 +10,14 @@ function hdf5write(rs,hdf5path)
 % Copyright 1999-2010 Michael Frenklach
 % $Revision: 1 $
 % Last modified: May 21, 2010
+% Last modified: October 25, 2017, jim: added warning if reaction direction & rate mismatch. 
+%
+
+
+if ~rs.Reactions.isDirectionMatch
+    warning(['ReactionSet contains a reaction rate which does not match ', ...
+        'the reaction direction.'])
+end
 
 hdf5write(hdf5path,'/title',  rs.Title,...
                    '/primeID',rs.PrimeId );
