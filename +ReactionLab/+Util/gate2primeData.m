@@ -35,6 +35,7 @@ function y = gate2primeData(varargin)
 % Modified: April 30, 2010, myf (added getBestCurrentId)
 % Modified:   May 13, 2010, myf (added getDataFileList and getAtticFileList)
 % Modified:  July 30, 2011, myf (changed 'thp' to 'th')
+% Modified: Sept  30, 2022, myf ('aguments' to 'args' in function getPath)
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -97,12 +98,12 @@ end
 
 
    function filePath = getPath(varargin)
-      arguments = varargin{1};
-      nArgs = length(arguments);
-      if nArgs < 2  ||  ~strcmpi(arguments{1},'primeID')
+      args = varargin{1};
+      nArgs = length(args);
+      if nArgs < 2  ||  ~strcmpi(args{1},'primeID')
          error('undefined input')
       end
-      catalog = arguments{2};   %  catalogName
+      catalog = args{2};   %  catalogName
       s1 = lower(catalog(1));   %  firstLetter
       switch s1
          case 'b'
@@ -126,13 +127,13 @@ end
       end
             
       if nArgs == 2
-         filePath = ['http://warehouse.cki-know.org/depository/' cat '/catalog/' arguments{2} '.xml'];
-%          filePath = char(Common.PrimeID2path(arguments{2}));
+         filePath = ['http://warehouse.cki-know.org/depository/' cat '/catalog/' args{2} '.xml'];
+%          filePath = char(Common.PrimeID2path(args{2}));
       elseif nArgs == 3
-         filePath = ['http://warehouse.cki-know.org/depository/' cat '/data/' arguments{2} '/' arguments{3}  '.xml'];
-%          filePath = char(Common.PrimeID2path(arguments{2:3}));
+         filePath = ['http://warehouse.cki-know.org/depository/' cat '/data/' args{2} '/' args{3}  '.xml'];
+%          filePath = char(Common.PrimeID2path(args{2:3}));
       else
-         error(['undefined number of arguments ' int2str(nArgs)])
+         error(['undefined number of args ' int2str(nArgs)])
       end
    end
 
