@@ -4,9 +4,9 @@ function thArray = readNasa7(strArray,fileName)
 % read NASA-type (7-coefficient) polynomials
 %   create and return Nasa7 object
 
-% Copyright 1999-2012 Michael Frenklach
-% $Revision: 1.0 $
+% Copyright 1999-2022 Michael Frenklach
 % Last modified: February 11, 2012
+% Last modified: November 20, 2022
 
 nLines = length(strArray);
 
@@ -37,9 +37,10 @@ close(Hwait);
    function jj = readThermoRecord(line,jj)
    % read a species record
       th = th0;
-%       th.SpeciesKey = strtrim(line(1:18));
-      th.SpeciesKey = strtok(strtrim(line(1:18)));
-      th.Comment = strtrim(line(19:24));
+%       th.SpeciesKey = strtok(strtrim(line(1:18)));
+      keys = string(strtrim(line(1:18))).split;
+      th.SpeciesKey = keys(1);
+      th.Comment = keys.join(" ") + " " + line(19:24);
       el = struct('symbol',{},'number',{});
       for i1 = 1:4
          ii = 20 + 5*i1;

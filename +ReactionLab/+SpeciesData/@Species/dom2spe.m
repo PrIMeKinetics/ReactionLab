@@ -2,8 +2,8 @@ function spe = dom2spe(speDoc)
 % speciesObj = dom2spe(speDocObj)
 
 % Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.0 $
-% Last modified: December 15, 2010
+%      modified: December 15, 2010
+% Last modified:   August 15, 2022: line 54 fixed
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
@@ -51,7 +51,7 @@ end
 additionalData = speDoc.GetElementsByTagName('additionalDataItem');
 len = double(additionalData.Count);
 if len > 0
-   adata = rs.AdditionalData;
+   adata = spe.AdditionalData;
    for i1 = 1:len
       dataItem = additionalData.Item(i1-1);
       adata(i1).itemType = char(dataItem.GetAttribute('itemType'));

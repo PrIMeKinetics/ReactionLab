@@ -1,7 +1,7 @@
 function y = gate2primeData(varargin)
 % function y = gate2primeData(strAction, cellArrArguments)
 %
-%   for the DLR site
+%   for local use
 %
 % This is the application gateway to PrIMe data. It is an interface
 % through which applications can access the data stored in the PrIMe Warehouse
@@ -35,10 +35,14 @@ function y = gate2primeData(varargin)
 % Modified: April 30, 2010, myf (added getBestCurrentId)
 % Modified:   May 13, 2010, myf (added getDataFileList and getAtticFileList)
 % Modified:  July 30, 2011, myf (changed 'thp' to 'th')
-% Modified: Sept  30, 2022, myf ('aguments' to 'args' in function getPath)
+% Modified:   Oct  1, 2022, myf ('aguments' to 'args' in function getPath)
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
+
+w = what('Matlab');
+localDepository = what(fullfile(fileparts(w(1).path),...
+                       'primewarehouse','depository')).path;
 
 if nargin == 0
    y = { 'Current methods are:'
@@ -66,7 +70,8 @@ if ischar(action)
          y = char(PrimeKinetics.PrimeHandle.Data.Common.GetPreferredKey(DOMObj));
       case 'getDOM'
          if strcmpi(varargin{2}{1},'element')
-            filePath = ['http://warehouse.cki-know.org/depository/elements/catalog/' lower(varargin{2}{2}) '.xml'];
+            filePath = fullfile(localDepository,...
+               'elements','catalog',[lower(varargin{2}{2}) '.xml']);
          else
             filePath = getPath(varargin{2});
          end
@@ -127,31 +132,25 @@ end
       end
             
       if nArgs == 2
-         filePath = ['http://warehouse.cki-know.org/depository/' cat '/catalog/' args{2} '.xml'];
-%          filePath = char(Common.PrimeID2path(args{2}));
+         filePath = fullfile(localDepository,...
+                              cat,'catalog',[args{2} '.xml']);
       elseif nArgs == 3
-         filePath = ['http://warehouse.cki-know.org/depository/' cat '/data/' args{2} '/' args{3}  '.xml'];
-%          filePath = char(Common.PrimeID2path(args{2:3}));
+         filePath = fullfile(localDepository,...
+                              cat,'data',args{2},[args{3} '.xml']);
       else
          error(['undefined number of args ' int2str(nArgs)])
       end
    end
 
    function doc = getDOM(filePath)
-      docStr = webread(filePath,weboptions('ContentType','text'));
-      if docStr(1) ~= '<'
-         [~,docStr] = strtok(docStr,'<');
-      end
-      doc = System.Xml.XmlDocument;
-      doc.LoadXml(docStr);
-      
-%       doc = webread(filePath,weboptions('ContentType','xmldom'));
-      
-%       a2 = conn.Load(filePath);
-%       if ~a2.status
-%          error(['could not download ' filePath])
+%       docStr = webread(filePath,weboptions('ContentType','text'));
+%       if docStr(1) ~= '<'
+%          [~,docStr] = strtok(docStr,'<');
 %       end
-%       doc = a2.result;
+      doc = System.Xml.XmlDocument;
+      doc.LoadXml(filePath);
+%       doc.LoadXml(docStr);
+%       doc = webread(filePath,weboptions('ContentType','xmldom'));
    end
 
    function primeId = getBestCurrentId(varargin)
