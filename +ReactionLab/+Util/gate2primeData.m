@@ -36,13 +36,13 @@ function y = gate2primeData(varargin)
 % Modified:   May 13, 2010, myf (added getDataFileList and getAtticFileList)
 % Modified:  July 30, 2011, myf (changed 'thp' to 'th')
 % Modified:   Oct  1, 2022, myf ('aguments' to 'args' in function getPath)
+% Modified:   Dec  5, 2022, myf changed doc.LoadXml( ) to doc.Load( )
 
 NET.addAssembly('System.Xml');
 import System.Xml.*;
 
-w = what('Matlab');
-localDepository = what(fullfile(fileparts(w(1).path),...
-                       'primewarehouse','depository')).path;
+w = what('primewarehouse');
+localDepository = fullfile(w.path,'depository');
 
 if nargin == 0
    y = { 'Current methods are:'
@@ -61,13 +61,13 @@ if ischar(action)
       case 'show'
          filePath = getPath(varargin{2});
          DOMObj = getDOM(filePath);
-         xv = PrimeKinetics.PrimeHandle.XmlViewer(DOMObj);
+%          xv = PrimeKinetics.PrimeHandle.XmlViewer(DOMObj);
          xv.Show();
          y = '';
       case 'getPreferredKey'
          filePath = getPath(varargin{2});
          DOMObj = getDOM(filePath);
-         y = char(PrimeKinetics.PrimeHandle.Data.Common.GetPreferredKey(DOMObj));
+%          y = char(PrimeKinetics.PrimeHandle.Data.Common.GetPreferredKey(DOMObj));
       case 'getDOM'
          if strcmpi(varargin{2}{1},'element')
             filePath = fullfile(localDepository,...
@@ -148,7 +148,8 @@ end
 %          [~,docStr] = strtok(docStr,'<');
 %       end
       doc = System.Xml.XmlDocument;
-      doc.LoadXml(filePath);
+      doc.Load(filePath);
+%       doc.LoadXml(filePath);
 %       doc.LoadXml(docStr);
 %       doc = webread(filePath,weboptions('ContentType','xmldom'));
    end
@@ -157,7 +158,7 @@ end
       dataPrimeId = [varargin{3} '00000000'];
       switch varargin{3}
          case 'th'
-            filePath = ['depository/species/data/' varargin{2} '/th00000000.xml'];
+            filePath = fullfile(localDepository,['/species/data/' varargin{2} '/th00000000.xml']);
             doc0 = getDOM(filePath);
             pointerNode = doc0.GetElementsByTagName('thermodynamicDataLink').Item(0);
             primeId = char(pointerNode.GetAttribute('primeID'));
