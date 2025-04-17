@@ -1,8 +1,8 @@
 classdef Element
    
-% Copyright 1999-2010 Michael Frenklach
-% $Revision: 1.0 $
+% Copyright 1999-2025 Michael Frenklach
 % Last modified: March 28, 2010
+% Last modified:  April 16, 2025: added input of YAML file
    
    properties
       Id          = '';
