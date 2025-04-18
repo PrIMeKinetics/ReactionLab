@@ -6,7 +6,7 @@ function readYamlFile(rs,fileName)
 %
 % Copyright 1999-2025 Michael Frenklach
 % Last modified: November 29, 2010
-% Last modified:    April 16, 2025
+% Last modified:    April 17, 2025
 
 elemCell = {};
 speCell  = {};
@@ -19,8 +19,35 @@ ystr = yaml.loadFile(fileName);
 rs.Title = ystr.input_files{1}.extractBefore(".");
 
 % parse for elements
-elemCell = ystr.phases{1}.elements;
+elList = ystr.phases{1}.elements;
+elListObj = ReactionLab.SpeciesData.ElementList();
+for i1 = 1:numel(elList)
+   elObj = ReactionLab.SpeciesData.Element(char(elList{i1}));
+   elListObj = add(elListObj,elObj);
+end
+rs.Elements =  elListObj;
 
+% parse species
+speList = ystr.species;
+speListObj = ReactionLab.SpeciesData.SpeciesList();
+for i2 = 1:numel(speList)
+   spe = speList{i2};
+   comp = spe.composition;
+   elems = fieldnames(comp);
+   speObj = ReactionLab.SpeciesData.Species();
+   speObj.Key = spe.name;
+   for i3 = 1:numel(elems)
+      % speObj.
+   end
+   
+   % speObj.Elements = 
+   speObj.Mass = molweight(speObj,rs);
+end
+speListObj = speListObj.add(speObj);
+
+rs.Species = speListObj;
+
+keyboard
 
 
 

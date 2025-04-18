@@ -28,7 +28,7 @@ classdef ReactionSet < dynamicprops
                obj = rs.dom2rxnset(arg);
             elseif ischar(arg)  % primeId
                if endsWith(arg,'.yaml')
-                  obj.readYamlFile(fileName);
+                  obj.readYamlFile(arg);
                else
                   rs = ReactionLab.ModelData.ReactionSet();
                   rsDoc = ReactionLab.Util.gate2primeData('getDOM',{'primeId',arg});
